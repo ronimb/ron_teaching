@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>חומרי הוראה · רון</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#202d35;background:#f5f6f7;color-scheme:light}*{box-sizing:border-box}body{margin:0}main{max-width:980px;margin:48px auto;padding:0 20px}header{display:flex;justify-content:space-between;gap:20px;align-items:start}h1{font-size:29px;margin:0 0 10px}p{line-height:1.6;margin:0 0 20px;color:#52616b}a{color:#125c89;text-underline-offset:3px}button,input{font:inherit}button{cursor:pointer;border:1px solid #cbd4da;background:white;border-radius:7px;padding:9px 13px;color:#243e4e}button:hover{background:#edf4f8}button:disabled{opacity:.6;cursor:wait}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #2282b9;outline-offset:3px}.tools{display:flex;gap:10px;margin:25px 0 18px}input[type=search]{width:100%;border:1px solid #bbc8d0;padding:13px 15px;border-radius:8px;background:#fff}nav{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-height:35px;margin-bottom:15px}nav a{font-weight:bold}.panel{background:#fff;border:1px solid #dce2e6;border-radius:10px;overflow:hidden}.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 20px;border-bottom:1px solid #e7ecef}.row:last-child{border-bottom:0}.name{min-width:0;overflow-wrap:anywhere}.name>a{font-size:17px;line-height:1.5;font-weight:bold}.path{font-size:12px;color:#6c7c85;direction:ltr;text-align:right;overflow-wrap:anywhere;margin-top:5px}.actions{display:flex;gap:14px;align-items:center;flex-shrink:0}.folder{display:block;width:100%;text-align:right;background:white;border:0;border-radius:0;font-size:18px;font-weight:bold;padding:20px}.folder span{font-size:13px;font-weight:normal;color:#617582;margin-right:10px}.empty{padding:28px;color:#617582}.status{min-height:26px;font-size:14px;margin:14px 0}footer{font-size:13px;color:#617582;margin:22px 0;line-height:1.7}dialog{border:1px solid #cbd4da;border-radius:10px;width:min(540px,90vw);padding:24px}dialog::backdrop{background:#17293666}dialog input{width:100%;padding:12px;margin:8px 0 20px;direction:ltr}dialog button{float:left}@media(max-width:600px){main{margin:26px auto;padding:0 14px}header{display:block}header>a{font-size:13px}.row{align-items:start;flex-direction:column;padding:16px}.actions{width:100%;justify-content:flex-end}.path{font-size:11px}h1{font-size:25px}}
+</style>
+<main>
+<header><div><h1>חומרי הוראה</h1><p>בוחרים תיקייה, פותחים דף או מעתיקים קישור לשיתוף.</p></div><a href="https://github.com/ronimb/ron_teaching" target="_blank" rel="noopener">המאגר</a></header>
+<div class="tools"><input id="search" type="search" placeholder="חיפוש שם קובץ בתיקייה ובתיקיות המשנה…" aria-label="חיפוש קבצים"><button id="refresh" type="button">רענון</button></div>
+<nav id="breadcrumbs" aria-label="מיקום בתיקיות"></nav>
+<div id="listing" class="panel" aria-busy="true"><div class="empty">טוען קבצים…</div></div>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+<footer>הרשימה מתעדכנת ישירות מהמאגר. קבצים חדשים יופיעו לאחר רענון; פרסומם באתר עשוי להימשך כמה דקות.</footer>
+</main>
+<dialog id="copy-dialog"><p>אפשר להעתיק את הקישור מכאן:</p><input id="copy-url" readonly aria-label="קישור לדף"><button id="close-dialog" type="button">סגירה</button></dialog>
+<noscript>יש להפעיל JavaScript בדפדפן כדי להציג את רשימת הקבצים.</noscript>
+<script>
+'use strict';
+const REPO='ronimb/ron_teaching', BRANCH='main';
+const PAGES='https://ronimb.github.io/ron_teaching/';
+const ALLOWED=['worksheets','helper-sheets','interactive-apps'];
+const LABELS={'worksheets':'דפי עבודה','helper-sheets':'דפי עזר','interactive-apps':'יישומים','3-יחל':'3 יח״ל','4-יחל':'4 יח״ל'};
+const CACHE='ron-teaching-file-tree-v1';
+const listing=document.querySelector('#listing'), search=document.querySelector('#search');
+const status=document.querySelector('#status'), refresh=document.querySelector('#refresh');
+const dialog=document.querySelector('#copy-dialog');
+let files=[], loaded=false, stale=false;
+const label=part=>LABELS[part]||part;
+const encodePath=path=>path.split('/').map(encodeURIComponent).join('/');
+const pageURL=path=>PAGES+encodePath(path);
+const folderURL=folder=>'#'+new URLSearchParams(folder?{folder}:{}).toString();
+const currentFolder=()=>new URLSearchParams(location.hash.slice(1)).get('folder')||'';
+function element(tag,text,cls){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(cls)node.className=cls;return node;}
+function normalizeTree(tree){
+  return tree.filter(item=>item.type==='blob'&&ALLOWED.includes(item.path.split('/')[0])&&/\.html?$/i.test(item.path)).map(item=>item.path).sort((a,b)=>a.localeCompare(b,'he'));
+}
+function navigate(folder){search.value='';if(currentFolder()===folder)render();else location.hash=folderURL(folder);}
+function breadcrumb(folder){
+  const nav=document.querySelector('#breadcrumbs');nav.replaceChildren();
+  const home=element('a','כל החומרים');home.href=folderURL('');home.onclick=()=>{search.value='';};nav.append(home);
+  const parts=folder?folder.split('/'):[];
+  parts.forEach((part,i)=>{nav.append(element('span','/'));const link=element('a',label(part));link.href=folderURL(parts.slice(0,i+1).join('/'));link.onclick=()=>{search.value='';};nav.append(link);});
+}
+function render(){
+  if(!loaded)return;
+  const folder=currentFolder(),prefix=folder?folder+'/':'';
+  breadcrumb(folder);listing.replaceChildren();
+  const query=search.value.trim().toLocaleLowerCase('he');
+  const matching=files.filter(path=>path.startsWith(prefix)&&(!query||path.toLocaleLowerCase('he').includes(query)||path.split('/').some(part=>label(part).toLocaleLowerCase('he').includes(query))));
+  const folders=new Map(),visible=[];
+  for(const path of matching){const tail=path.slice(prefix.length);if(!query&&tail.includes('/')){const child=tail.split('/')[0];folders.set(child,(folders.get(child)||0)+1);}else visible.push(path);}
+  for(const [name,count] of folders){const button=element('button',label(name),'folder');button.type='button';button.append(element('span',`${count} דפים`));button.onclick=()=>navigate(prefix+name);listing.append(button);}
+  for(const path of visible){
+    const row=element('div',undefined,'row'),name=element('div',undefined,'name');
+    const link=element('a',path.split('/').pop().replace(/\.html?$/i,'').replaceAll('_',' '));link.href=pageURL(path);link.target='_blank';link.rel='noopener';
+    name.append(link);if(query)name.append(element('div',path,'path'));
+    const actions=element('div',undefined,'actions'),open=element('a','פתיחה');open.href=pageURL(path);open.target='_blank';open.rel='noopener';
+    const copy=element('button','העתקת קישור');copy.type='button';copy.setAttribute('aria-label','העתקת קישור: '+link.textContent);copy.onclick=()=>copyLink(path,copy);
+    actions.append(open,copy);row.append(name,actions);listing.append(row);
+  }
+  if(!matching.length)listing.append(element('div',query?'לא נמצאו קבצים התואמים לחיפוש.':'אין דפי HTML בתיקייה זו.','empty'));
+  status.textContent=(stale?'מוצגת רשימה שמורה; לא ניתן להתחבר למאגר כרגע. ':'')+`${matching.length} דפים`;
+}
+async function copyLink(path,button){
+  const url=pageURL(path);
+  try{await navigator.clipboard.writeText(url);button.textContent='הקישור הועתק ✓';status.textContent='הקישור הועתק ללוח.';setTimeout(()=>{button.textContent='העתקת קישור';},1800);}
+  catch{const field=document.querySelector('#copy-url');field.value=url;dialog.showModal();field.focus();field.select();}
+}
+async function load(){
+  refresh.disabled=true;listing.setAttribute('aria-busy','true');status.textContent='טוען את רשימת הקבצים…';
+  try{
+    const response=await fetch(`https://api.github.com/repos/${REPO}/git/trees/${encodeURIComponent(BRANCH)}?recursive=1`,{headers:{Accept:'application/vnd.github+json'},cache:'no-store',signal:AbortSignal.timeout(15000)});
+    if(!response.ok)throw new Error(response.status===403||response.status===429?'בוצעו יותר מדי בקשות. נסו שוב בעוד כמה דקות.':`לא ניתן לטעון את המאגר (${response.status}).`);
+    const data=await response.json();if(data.truncated||!Array.isArray(data.tree))throw new Error('הרשימה שהתקבלה אינה מלאה. נסו שוב מאוחר יותר.');
+    files=normalizeTree(data.tree);loaded=true;stale=false;
+    try{localStorage.setItem(CACHE,JSON.stringify(data.tree));}catch{}
+    render();
+  }catch(error){
+    if(!loaded){try{const cached=JSON.parse(localStorage.getItem(CACHE)||'null');if(Array.isArray(cached)){files=normalizeTree(cached);loaded=true;}}catch{}}
+    if(loaded){stale=true;render();}else{listing.replaceChildren(element('div','לא ניתן לטעון את הרשימה. לחצו על רענון כדי לנסות שוב.','empty'));status.textContent=error.name==='TimeoutError'?'החיבור ארך זמן רב מדי. נסו לרענן.':error.message;}
+  }finally{refresh.disabled=false;listing.setAttribute('aria-busy','false');}
+}
+search.addEventListener('input',render);refresh.onclick=load;window.addEventListener('hashchange',render);
+document.querySelector('#close-dialog').onclick=()=>dialog.close();
+load();
+</script>
+</html>
