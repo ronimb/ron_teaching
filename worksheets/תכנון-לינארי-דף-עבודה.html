@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>תכנון לינארי — משתנים ואילוצים</title>
+<style>
+@page { size:A4; margin:14mm 15mm; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial,"Noto Sans Hebrew",sans-serif; color:#111; font-size:14px; line-height:1.35; }
+.page { width:180mm; margin:12mm auto; padding:0; break-after:page; page-break-after:always; }
+.page:last-child { break-after:auto; page-break-after:auto; }
+h1 { font-size:25px; margin:0 0 3px; }
+h2 { font-size:20px; margin:12px 0 6px; }
+h3 { font-size:17px; margin:0 0 5px; }
+p { margin:5px 0 8px; }
+.meta { display:flex; justify-content:space-between; border-bottom:2px solid #222; padding:9px 0; margin-bottom:12px; }
+.intro { border:1px solid #777; background:#f5f5f5; padding:10px 12px; margin-bottom:13px; }
+.intro table { background:white; margin-bottom:0; }
+.intro p { margin-top:0; }
+table { width:100%; border-collapse:collapse; table-layout:fixed; margin:8px 0 0; }
+th,td { border:1px solid #555; padding:8px 9px; text-align:center; vertical-align:middle; }
+th { font-weight:600; background:#eee; }
+th:first-child,td:first-child { width:46%; text-align:right; }
+.exercise { margin:15px 0 0; break-inside:avoid; page-break-inside:avoid; }
+.blankhead { height:57px; background:white; }
+.fill td { height:38px; }
+.line { display:inline-block; width:80%; border-bottom:1px solid #333; height:18px; vertical-align:bottom; }
+.var { direction:ltr; unicode-bidi:isolate; font-family:Arial,sans-serif; }
+.foot { margin-top:15px; padding-top:7px; border-top:1px solid #777; display:flex; justify-content:space-between; font-size:12px; }
+.note { font-size:14px; margin-top:10px; }
+.spacious .exercise { margin-top:27px; }
+.spacious .fill td { height:54px; }
+.spacious .blankhead { height:68px; }
+.check { margin-top:22px; line-height:1.8; }
+@media screen { body { background:#ddd; } .page { background:white; padding:14mm 15mm; width:210mm; min-height:297mm; box-shadow:0 2px 8px #999; } }
+@media print {
+ .intro,th { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+ body { font-size:13.5px; line-height:1.25; }
+ .page { margin:0; width:180mm; }
+ h1 { font-size:23px; } h2 { font-size:18px; margin:8px 0 5px; }
+ h3 { font-size:16px; }
+ .meta { padding:7px 0; margin-bottom:9px; }
+ .intro { padding:8px 10px; margin-bottom:10px; }
+ .intro table { font-size:12.5px; }
+ th,td { padding:6px 8px; }
+ .exercise { margin-top:11px; }
+ .fill td { height:35px; }
+ .blankhead { height:50px; }
+ .spacious .exercise { margin-top:17px; }
+ .spacious .fill td { height:43px; }
+ .spacious .blankhead { height:54px; }
+ .check { margin-top:16px; line-height:1.6; }
+ .foot { margin-top:12px; }
+}
+</style>
+</head>
+<body>
+<section class="page">
+<h1>תכנון לינארי — משתנים ואילוצים</h1>
+<div>דף עבודה מדורג · מתמטיקה, 3 יחידות לימוד</div>
+<div class="meta"><span>שם: ____________________</span><span>כיתה: ________</span><span>תאריך: ____________</span></div>
+<h2>חלק א׳ — מזהים את המשתנים</h2>
+<div class="intro">
+<p>משתנה מתאר כמות שרוצים לקבוע. בהגדרה נכתוב <strong>מה בדיוק סופרים</strong>. לדוגמה, במזנון מכינים כריכי גבינה וכריכי חביתה. כך נגדיר את המשתנים בכותרות השורות:</p>
+<table><tr><th>הגדרת המשתנים</th><th>מספר פרוסות הלחם הדרושות לכריך אחד</th></tr><tr><td><span class="var">x</span> — מספר כריכי הגבינה שמכינים</td><td>2</td></tr><tr><td><span class="var">y</span> — מספר כריכי החביתה שמכינים</td><td>2</td></tr></table>
+</div>
+<p><strong>הוראות:</strong> בכל תרגיל השלימו את שתי הגדרות המשתנים במלואן. אין צורך לכתוב אי־שוויונות.</p>
+<article class="exercise"><h3>1. זרי פרחים</h3><p>בחנות מתכננים כמה זרים קטנים וכמה זרים גדולים להכין. לזר קטן דרושים 3 פרחים ולזר גדול 5 פרחים. בחנות יש 90 פרחים.</p>
+<table class="fill"><tr><th>הגדרת המשתנים — השלימו</th><th>מספר הפרחים הדרושים לזר אחד</th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td>3</td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td>5</td></tr><tr><td>מספר הפרחים הזמינים לכל היותר</td><td>90</td></tr></table></article>
+<article class="exercise"><h3>2. ערכות ציור</h3><p>מתכננים כמה ערכות בסיסיות וכמה ערכות מורחבות להכין. בערכה בסיסית יש 4 צבעים ובערכה מורחבת 6 צבעים. לרשות המארגנים 120 צבעים.</p>
+<table class="fill"><tr><th>הגדרת המשתנים — השלימו</th><th>מספר הצבעים הדרושים לערכה אחת</th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td>4</td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td>6</td></tr><tr><td>מספר הצבעים הזמינים לכל היותר</td><td>120</td></tr></table></article>
+<article class="exercise"><h3>3. שעות עבודה</h3><p>תלמיד מתכנן כמה שעות לעבוד באריזת מוצרים וכמה שעות בסידור מדפים בשבוע. הוא יכול לעבוד לכל היותר 18 שעות בשבוע בסך הכול.</p>
+<table class="fill"><tr><th>הגדרת המשתנים — השלימו</th><th>שעות מתוך הזמן הזמין, לכל שעת עבודה</th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td>1</td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td>1</td></tr><tr><td>מספר שעות העבודה הזמינות לכל היותר בשבוע</td><td>18</td></tr></table></article>
+<div class="foot"><span>בדקו: האם ברור מה סופרים בכל משתנה?</span><span>עמוד 1 מתוך 4</span></div>
+</section>
+<section class="page">
+<h1>חלק ב׳ — מזהים מה מוגבל</h1>
+<div class="meta"><span>שם: ____________________</span><span>תכנון לינארי · זיהוי אילוצים</span></div>
+<div class="intro"><p>אילוץ הוא מגבלה שצריך להתחשב בה. נשאל: <strong>מה מוגבל וכמה ממנו זמין?</strong> כותרת העמודה מתארת את המשאב הדרוש, והשורה התחתונה מציינת את הגבול. לדוגמה, להכנת קישוטים משתמשים בדפים ובחוט. לרשותנו 20 דפים ו־30 מטרים של חוט:</p>
+<table><tr><th>הגדרת המשתנים</th><th>מספר הדפים הדרושים לקישוט אחד</th><th>אורך החוט הדרוש לקישוט אחד, במטרים</th></tr><tr><td><span class="var">x</span> — מספר הקישוטים הקטנים</td><td>1</td><td>2</td></tr><tr><td><span class="var">y</span> — מספר הקישוטים הגדולים</td><td>2</td><td>3</td></tr><tr><td>הכמות הזמינה לכל היותר</td><td>20</td><td>30</td></tr></table></div>
+<p><strong>הוראות:</strong> השלימו רק את כותרות שתי העמודות הריקות. כתבו תיאור מלא, כולל יחידות כשצריך — למשל, „זמן העבודה הדרוש לצמיד אחד, בדקות”.</p>
+<article class="exercise"><h3>4. הכנת צמידים</h3><p>לצמיד קצר דרושים 2 חרוזים ודקת עבודה אחת. לצמיד ארוך דרושים 3 חרוזים ו־2 דקות עבודה. לרשות החוג 60 חרוזים ו־30 דקות עבודה.</p>
+<table><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — מספר הצמידים הקצרים שמכינים</td><td>2</td><td>1</td></tr><tr><td><span class="var">y</span> — מספר הצמידים הארוכים שמכינים</td><td>3</td><td>2</td></tr><tr><td>הכמות הזמינה לכל היותר</td><td>60</td><td>30</td></tr></table></article>
+<article class="exercise"><h3>5. הכנת עוגות</h3><p>לעוגת שוקולד דרושות 2 כוסות קמח ו־3 ביצים. לעוגת תפוזים דרושות 3 כוסות קמח ו־2 ביצים. לרשות הקונדיטוריה 36 כוסות קמח ו־30 ביצים.</p>
+<table><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — מספר עוגות השוקולד שמכינים</td><td>2</td><td>3</td></tr><tr><td><span class="var">y</span> — מספר עוגות התפוזים שמכינים</td><td>3</td><td>2</td></tr><tr><td>הכמות הזמינה לכל היותר</td><td>36</td><td>30</td></tr></table></article>
+<article class="exercise"><h3>6. הכנת מדפים</h3><p>למדף קצר דרושים 2 מטרים של עץ ו־4 ברגים. למדף ארוך דרושים 3 מטרים של עץ ו־8 ברגים. לרשות הנגרייה 30 מטרים של עץ ו־72 ברגים.</p>
+<table><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — מספר המדפים הקצרים שמכינים</td><td>2</td><td>4</td></tr><tr><td><span class="var">y</span> — מספר המדפים הארוכים שמכינים</td><td>3</td><td>8</td></tr><tr><td>הכמות הזמינה לכל היותר</td><td>30</td><td>72</td></tr></table></article>
+<div class="foot"><span>זכרו: כותרת מלאה מסבירה מה מודדים ובאילו יחידות.</span><span>עמוד 2 מתוך 4</span></div>
+</section>
+<section class="page spacious">
+<h1>חלק ג׳ — בונים טבלה מלאה</h1>
+<div class="meta"><span>שם: ____________________</span><span>תכנון לינארי · משתנים ואילוצים</span></div>
+<div class="intro"><p>נגדיר את המשתנים בכותרות השורות, ואת המשאבים בכותרות העמודות. בכל שורת משתנה נכתוב את הכמות הדרושה <strong>למוצר אחד</strong>. בשורה התחתונה נכתוב כמה זמין בסך הכול. לדוגמה: לשקית הפתעה קטנה דרושות 2 סוכריות ובלון אחד, ולגדולה 4 סוכריות ו־2 בלונים. יש 40 סוכריות ו־16 בלונים:</p>
+<table><tr><th>הגדרת המשתנים</th><th>מספר הסוכריות הדרושות לשקית אחת</th><th>מספר הבלונים הדרושים לשקית אחת</th></tr><tr><td><span class="var">x</span> — מספר השקיות הקטנות שמכינים</td><td>2</td><td>1</td></tr><tr><td><span class="var">y</span> — מספר השקיות הגדולות שמכינים</td><td>4</td><td>2</td></tr><tr><td>הכמות הזמינה לכל היותר</td><td>40</td><td>16</td></tr></table></div>
+<p><strong>הוראות:</strong> השלימו הגדרות משתנים מלאות, כותרות עמודות מלאות ואת כל המספרים החסרים. אין צורך לכתוב אי־שוויונות.</p>
+<article class="exercise"><h3>7. מארזי עוגיות</h3><p>במאפייה מכינים מארזים קטנים וגדולים. במארז קטן יש 2 עוגיות שוקולד ועוגיית וניל אחת. במארז גדול יש 3 עוגיות שוקולד ו־2 עוגיות וניל. לרשות המאפייה 60 עוגיות שוקולד ו־36 עוגיות וניל.</p><p class="note">נתון אחד כבר מופיע בטבלה כדי לעזור לכם להתחיל.</p>
+<table class="fill"><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td>2</td><td></td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td>הכמות הזמינה לכל היותר</td><td></td><td></td></tr></table></article>
+<article class="exercise"><h3>8. כרטיסי ברכה</h3><p>מכינים כרטיסי ברכה קטנים וגדולים. לכרטיס קטן דרושים דף צבעוני אחד ו־2 מדבקות. לכרטיס גדול דרושים 2 דפים צבעוניים ו־3 מדבקות. לרשות התלמידים 40 דפים צבעוניים ו־70 מדבקות.</p>
+<table class="fill"><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td>הכמות הזמינה לכל היותר</td><td></td><td></td></tr></table></article>
+<div class="foot"><span>בדקו: האם כל מספר נמצא בשורה ובעמודה המתאימות?</span><span>עמוד 3 מתוך 4</span></div>
+</section>
+<section class="page spacious">
+<h1>חלק ג׳ — ממשיכים לתרגל</h1>
+<div class="meta"><span>שם: ____________________</span><span>תכנון לינארי · טבלה מלאה</span></div>
+<div class="intro"><p>גם כאן מתחילים בשאלה <strong>מה רוצים לקבוע?</strong> וממשיכים לשאלה <strong>מה מוגבל?</strong> למשל: במפעל מכינים דגלים קטנים וגדולים. לדגל קטן דרושים מטר בד אחד ו־2 דקות עבודה, ולגדול 2 מטרים של בד ו־3 דקות עבודה. יש 20 מטרים של בד ו־36 דקות עבודה. הטבלה היא:</p>
+<table><tr><th>הגדרת המשתנים</th><th>אורך הבד הדרוש לדגל אחד, במטרים</th><th>זמן העבודה הדרוש לדגל אחד, בדקות</th></tr><tr><td><span class="var">x</span> — מספר הדגלים הקטנים שמכינים</td><td>1</td><td>2</td></tr><tr><td><span class="var">y</span> — מספר הדגלים הגדולים שמכינים</td><td>2</td><td>3</td></tr><tr><td>הכמות הזמינה לכל היותר</td><td>20</td><td>36</td></tr></table></div>
+<p><strong>הוראות:</strong> קראו את הסיפור והשלימו את כל החלקים הריקים בטבלה. הקפידו על כותרות מלאות ועל יחידות מתאימות.</p>
+<article class="exercise"><h3>9. עציצים מקושטים</h3><p>בחוג מכינים עציצים בעיצוב פשוט ובעיצוב מורכב. לעציץ בעיצוב פשוט דרושות 3 מדבקות ו־2 דקות עבודה. לעציץ בעיצוב מורכב דרושות 5 מדבקות ו־4 דקות עבודה. לרשות החוג 90 מדבקות ו־60 דקות עבודה.</p>
+<table class="fill"><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td>הכמות הזמינה לכל היותר</td><td></td><td></td></tr></table></article>
+<article class="exercise"><h3>10. תיקי בד</h3><p>בסדנה מכינים תיקי בד קטנים וגדולים. לתיק קטן דרושים 2 מטרים של בד ו־3 דקות עבודה במכונת תפירה. לתיק גדול דרושים 3 מטרים של בד ו־5 דקות עבודה במכונת תפירה. לרשות הסדנה 40 מטרים של בד ו־60 דקות עבודה במכונת התפירה.</p>
+<table class="fill"><tr><th>הגדרת המשתנים</th><th class="blankhead"></th><th class="blankhead"></th></tr><tr><td><span class="var">x</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td><span class="var">y</span> — <span class="line"></span></td><td></td><td></td></tr><tr><td>הכמות הזמינה לכל היותר</td><td></td><td></td></tr></table></article>
+<div class="check"><strong>בדיקה עצמית:</strong><br>□ הגדרתי במדויק מה סופרים בכל משתנה.<br>□ כתבתי כותרות עמודות מלאות, כולל יחידות כשצריך.<br>□ הבחנתי בין הכמות הדרושה למוצר אחד לבין הכמות הזמינה בסך הכול.</div>
+<div class="foot"><span>סיימתם! עברו שוב על הכותרות ובדקו שהן ברורות.</span><span>עמוד 4 מתוך 4</span></div>
+</section>
+</body>
+</html>

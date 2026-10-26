@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>לוח בקרה · מתמטיקה · ברנר</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c45c26'/%3E%3Cpath d='M38 0h12c5.5 0 10 4.5 10 10v8H38V0Z' fill='%23e8c4ad'/%3E%3Cpath d='M22 18c6.8 0 11.2 3.6 11.2 9.1 0 3.6-2.1 6.2-5.6 7.6 4.2 1.3 6.9 4.3 6.9 8.6 0 6.2-5.1 10.7-13.2 10.7H12.5V18H22Zm-2.6 13.8h2.2c3.1 0 4.9-1.5 4.9-3.8s-1.8-3.8-4.8-3.8h-2.3v7.6Zm0 16.2h2.8c3.6 0 5.7-1.8 5.7-4.5s-2.1-4.4-5.8-4.4h-2.7v8.9Z' fill='%23fffaf3'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --desk: #e8dfd2;
+      --desk-deep: #d9cbb8;
+      --ink: #1c1610;
+      --muted: #6a5d50;
+      --paper: #fffaf3;
+      --line: rgba(28, 22, 16, 0.1);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --shadow: 0 14px 28px rgba(28, 22, 16, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Assistant", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.45), transparent 28%),
+        repeating-linear-gradient(90deg, transparent 0, transparent 46px, rgba(28, 22, 16, 0.03) 46px, rgba(28, 22, 16, 0.03) 47px),
+        linear-gradient(165deg, #efe6d8 0%, var(--desk) 55%, var(--desk-deep) 100%);
+    }
+
+    .page {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.4rem 0 3.5rem;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: stretch;
+      gap: 0.75rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .mashov {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+      padding: 0.9rem 1.2rem;
+      border-radius: 18px;
+      text-decoration: none;
+      color: #f7efe4;
+      background: linear-gradient(155deg, #2a2118 0%, #1a140f 100%);
+      box-shadow: 0 14px 28px rgba(28, 22, 16, 0.16);
+      transition: transform 0.25s var(--ease);
+    }
+
+    .mashov:hover { transform: translateY(-2px); }
+    .mashov:focus-visible { outline: 3px solid #c45c26; outline-offset: 3px; }
+    .mashov.is-empty { opacity: 0.55; pointer-events: none; }
+
+    .mashov-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .mashov-go {
+      font-size: 0.95rem;
+      font-weight: 700;
+      opacity: 0.8;
+    }
+
+    .gear {
+      width: 72px;
+      border: 0;
+      border-radius: 18px;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+
+    .gear:hover { background: #fff; }
+    .gear:focus-visible { outline: 3px solid #3d4f8a; outline-offset: 3px; }
+    .gear svg {
+      width: 1.45rem;
+      height: 1.45rem;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .block { margin-bottom: 1.7rem; }
+
+    .block h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .shortcut .folder-summary { min-height: 92px; }
+
+    .groups, .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .folder {
+      --tone: #c45c26;
+      border-radius: 8px 22px 22px 22px;
+      background: color-mix(in srgb, var(--tone) 10%, var(--paper));
+      box-shadow: var(--shadow);
+      overflow: visible;
+    }
+
+    .folder-summary {
+      list-style: none;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      min-height: 132px;
+      padding: 1.15rem 1.2rem;
+      position: relative;
+      user-select: none;
+    }
+
+    .folder-summary::-webkit-details-marker { display: none; }
+    .folder-summary:focus-visible { outline: 3px solid var(--tone); outline-offset: -3px; }
+
+    .folder-tab {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 34%;
+      height: 16px;
+      border-radius: 0 0 0 16px;
+      background: var(--tone);
+    }
+
+    .grade {
+      width: 4.2rem;
+      height: 4.2rem;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: var(--tone);
+      color: #fffaf3;
+      font-size: 1.7rem;
+      font-weight: 800;
+    }
+
+    .grade svg { display: block; }
+
+    .folder-copy h3 { margin: 0; font-size: 1.35rem; font-weight: 800; }
+    .folder-copy p { margin: 0.15rem 0 0; color: var(--muted); font-weight: 600; }
+
+    .folder-body { padding: 0 1.05rem 1.1rem; }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    .tile, .card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 112px;
+      padding: 0.9rem 0.95rem;
+      border-radius: 16px;
+      background: var(--paper);
+      color: var(--ink);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 16px rgba(28, 22, 16, 0.04);
+      transition: transform 0.25s var(--ease);
+    }
+
+    .tile:hover, .card:hover { transform: translateY(-3px); }
+    .tile:focus-visible, .card:focus-visible { outline: 2px solid var(--tone, #3d4f8a); outline-offset: 2px; }
+    .tile.is-empty, .card.is-empty {
+      opacity: 0.45;
+      pointer-events: none;
+      transform: none;
+    }
+
+    .icon {
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--tone) 16%, white);
+      color: var(--tone);
+    }
+
+    .icon svg { width: 1.1rem; height: 1.1rem; }
+    .tile strong, .card strong { font-size: 1.02rem; font-weight: 800; }
+    .tile span, .card span, .meta { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+
+    .card { --tone: #1f6f6a; min-height: 128px; }
+    .card.book {
+      --tone: #8a5a1f;
+      border-radius: 14px 6px 6px 14px;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.14) 0 8px, transparent 8px),
+        color-mix(in srgb, var(--tone) 88%, black);
+      color: #fffaf3;
+      border: 0;
+    }
+    .card.book span { color: rgba(255, 250, 243, 0.75); }
+    .card.book { position: relative; overflow: visible; }
+
+    .book-tip {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 8px);
+      width: max(100%, 15rem);
+      padding: 0.7rem 0.8rem;
+      border-radius: 12px;
+      background: #1c1610;
+      color: #fffaf3;
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.45;
+      box-shadow: 0 10px 22px rgba(28, 22, 16, 0.22);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(4px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 5;
+      text-align: right;
+    }
+
+    .book-tip b {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.72rem;
+      opacity: 0.7;
+    }
+
+    .card.book:hover .book-tip,
+    .card.book:focus-visible .book-tip {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .books-card > summary { list-style: none; cursor: pointer; }
+    .books-card > summary::-webkit-details-marker { display: none; }
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(8.2rem, 1fr));
+      gap: 0.65rem;
+      margin-top: 0.7rem;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      padding: 1.1rem;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--paper) 70%, transparent);
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 22, 16, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 20;
+    }
+
+    .scrim.on { opacity: 1; pointer-events: auto; }
+
+    .settings {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.55), transparent 28%),
+        #fffaf3;
+      box-shadow: none;
+      transform: translateY(110%);
+      transition: transform 0.35s var(--ease);
+      z-index: 21;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .settings.on { transform: translateY(0); }
+
+    .settings-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.35rem clamp(1.25rem, 4vw, 2.5rem);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 243, 0.92);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .settings-head h2 { margin: 0; font-size: 1.55rem; font-weight: 800; }
+    .settings-body {
+      width: min(920px, 100%);
+      margin: 0 auto;
+      padding: 1.6rem clamp(1.25rem, 4vw, 2.5rem) 3.5rem;
+      overflow: auto;
+    }
+
+    .field { display: grid; gap: 0.45rem; margin-bottom: 1.15rem; }
+    .field label, .pair label { font-size: 0.9rem; font-weight: 800; color: var(--muted); }
+    .field input, .pair input, .field textarea {
+      width: 100%;
+      border: 1px solid #e0d4c4;
+      background: #fff;
+      border-radius: 12px;
+      padding: 0.8rem 0.95rem;
+      font: inherit;
+      font-size: 1.02rem;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+
+    .field textarea { min-height: 5.5rem; resize: vertical; }
+
+    .pair { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.85rem; margin-bottom: 0.9rem; }
+    .pair > div { display: grid; gap: 0.45rem; }
+
+    .group-edit {
+      margin: 1.5rem 0;
+      padding: 1.35rem 1.3rem 1.15rem;
+      border-radius: 20px;
+      background: #f4ece1;
+    }
+
+    .group-edit h3 { margin: 0 0 1.05rem; font-size: 1.2rem; }
+    .group-edit h4 {
+      margin: 1.55rem 0 0.8rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    .sub-card {
+      margin: 0 0 1rem;
+      padding: 1rem 1rem 0.55rem;
+      border-radius: 14px;
+      background: rgba(255, 250, 243, 0.85);
+    }
+    .row-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+
+    button.btn, .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 0.7rem 1.05rem;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      background: #1c1610;
+      color: #fffaf3;
+    }
+
+    button.ghost { background: transparent; color: #8a3b1f; }
+    button.light { background: #fff; color: var(--ink); border: 1px solid #e0d4c4; }
+
+    .save-status {
+      margin: 0 0 1.1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      background: #e7f3ea;
+      color: #1f6f6a;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .save-status.err { background: #f8e6df; color: #8a3b1f; }
+    .hint-note { margin: 0 0 1.25rem; color: var(--muted); font-size: 0.92rem; font-weight: 600; line-height: 1.55; }
+    .file-save-row { display: grid; gap: 0.55rem; margin: 0 0 1rem; }
+    .file-save-row .btn { width: 100%; }
+
+    .sync-banner {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 1.3rem;
+      padding: 0.9rem 1.05rem;
+      border-radius: 16px;
+      background: #fff6e8;
+      box-shadow: var(--shadow);
+    }
+    .sync-banner[hidden] { display: none !important; }
+    .sync-banner p {
+      margin: 0;
+      font-weight: 700;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+    .sync-banner .btn { flex: 0 0 auto; white-space: nowrap; }
+
+    @media (max-width: 800px) {
+      .groups, .cards, .tiles, .pair, .book-grid { grid-template-columns: 1fr; }
+      .mashov-go { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="toolbar">
+      <a id="mashov" class="mashov is-empty" href="#" target="_blank" rel="noopener">
+        <span class="mashov-title">משו״ב</span>
+        <span class="mashov-go">כניסה ←</span>
+      </a>
+      <button class="gear" type="button" data-expand-groups aria-label="הרחב את כל הקבוצות">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M8 3H4v4M16 3h4v4M8 21H4v-4M16 21h4v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 9h6v6H9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="gear" type="button" data-open-settings aria-label="הגדרות">⚙</button>
+    </div>
+
+    <div id="sync-banner" class="sync-banner" hidden>
+      <p id="sync-banner-text">יש שינויים שטרם נשמרו לקובץ המשותף.</p>
+      <button class="btn" type="button" data-link-file id="sync-banner-btn">שמירה לקובץ</button>
+    </div>
+
+    <section class="block">
+      <h2>הקבוצות</h2>
+      <div id="groups" class="groups"></div>
+    </section>
+
+    <section class="block" id="plans-block"></section>
+    <section class="block" id="books-block"></section>
+    <section class="block" id="links-block"></section>
+  </main>
+
+  <div class="scrim" data-close-settings></div>
+  <aside class="settings" id="settings" aria-hidden="true">
+    <div class="settings-head">
+      <h2>הגדרות</h2>
+      <button class="btn light" type="button" data-close-settings>סגור</button>
+    </div>
+    <div class="settings-body" id="settings-body"></div>
+  </aside>
+
+  <!-- DASHBOARD_SETTINGS: do not reset this JSON when editing the page -->
+  <script type="application/json" id="embedded-settings">
+{"updatedAt":1792576300435,"mashov":"https://web.mashov.info/teachers/main/dashboard","globalLinks":[{"id":"lsq0ajw","title":"איזור מורים יואל גבע","url":"https://my.geva.co.il/teacher-area-books/"},{"id":"ls6935s","title":"לוח רונית","url":"https://docs.google.com/spreadsheets/d/1v0UEfxCKoXAgY6GgiXPEkmVpOv_L9BbQaKtcHQD3CDY/edit?gid=1996734708#gid=1996734708"},{"id":"ljj5gyc","title":"מבחנים וריכוזים","url":"https://docs.google.com/document/d/1SuRBNr3-YgmwtY4i1FZfJP7UWD1s7qUy/edit?usp=sharing&ouid=117356084362064373126&rtpof=true&sd=true"},{"id":"lr8rcxk","title":"תיקייה צוותית משותפת","url":"https://drive.google.com/drive/folders/0AGS0081O5g-PUk9PVA"}],"groups":[{"id":"g-t","year":"ט׳","level":"הקבצה ב׳","planTitle":"פריסה שנתית","planUrl":"https://docs.google.com/document/u/0/d/1G2bPgjT8YFlLSSXu2gSphr7ZR2RPnCDsnwMNyo_t2ok/edit?tab=t.0","extras":[{"id":"e-formulas","title":"דף נוסחאות","url":"https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativa-Elyona/new-curriculum/3-MATH-Formula_NEW.pdf"},{"id":"e-classroom","title":"קלאסרום","url":"https://classroom.google.com/u/1/c/MjUzMTAwODM4NzZa"},{"id":"easnr33","title":"פריסה קודמת","url":"https://docs.google.com/document/d/16nXLX3InbfxfkQMYkYQa5POmzBGN7x0eFmDPXA89cAw/edit?tab=t.0"},{"id":"eh7mwx6","title":"תכנית הוראה מצומצמת","url":"https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativat-Beynayim/tashpaz/prisa_9B.pdf"}],"books":[{"title":"יואל גבע 801","url":"https://my.geva.co.il/flippbooks/801/index.html","topics":"אלגברה"},{"title":"גאומטריה חישובית","url":"https://teachers.mathstar.co.il/ebook/%d7%92%d7%99%d7%90%d7%95%d7%9e%d7%98%d7%a8%d7%99%d7%94-%d7%97%d7%99%d7%a9%d7%95%d7%91%d7%99%d7%aa-%d7%97%d7%9c%d7%a7-%d7%90/","topics":"גאומטריה"}]},{"id":"g-y","year":"י׳","level":"3 יח״ל","planTitle":"פריסה שנתית","planUrl":"https://docs.google.com/document/d/19vSie_HiapfY4Pf76-WOncjwwsl-AlefCITitDteUbk/edit?tab=t.0","extras":[{"id":"e-formulas","title":"דף נוסחאות","url":"https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativa-Elyona/new-curriculum/3-MATH-Formula_NEW.pdf"},{"id":"e-classroom","title":"קלאסרום","url":"https://classroom.google.com/u/1/c/MTYyNjUyNTY4NTQ1"}],"books":[{"title":"בני גורן - חלק א","url":"https://www.bennygoren.co.il/%D7%9E%D7%95%D7%A6%D7%A8/%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94-%d7%9c%d7%9b%d7%99%d7%aa%d7%94-%d7%99%d7%b3-3-%d7%99%d7%97%d7%99%d7%93%d7%95%d7%aa-%d7%9c%d7%99%d7%9e%d7%95%d7%93-%d7%97%d7%9c%d7%a7-%d7%90%d7%b3/","topics":"אשכול מדעים וחברה"},{"title":"בני גורן - חלק ב","url":"https://www.bennygoren.co.il/%D7%9E%D7%95%D7%A6%D7%A8/%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94-%d7%9c%d7%9b%d7%99%d7%aa%d7%94-%d7%99%d7%b3-3-%d7%99%d7%97%d7%99%d7%93%d7%95%d7%aa-%d7%9c%d7%99%d7%9e%d7%95%d7%93-%d7%97%d7%9c%d7%a7-%d7%91%d7%b3/","topics":"אשכול פיננסי כלכלי"},{"title":"בני גורן - חלק ג","url":"https://www.bennygoren.co.il/%D7%9E%D7%95%D7%A6%D7%A8/%d7%9e%d7%aa%d7%9e%d7%98%d7%99%d7%a7%d7%94-%d7%9c%d7%9b%d7%99%d7%aa%d7%94-%d7%99%d7%b3-3-%d7%99%d7%97%d7%99%d7%93%d7%95%d7%aa-%d7%9c%d7%99%d7%9e%d7%95%d7%93-%d7%97%d7%9c%d7%a7-%d7%92%d7%b3/","topics":"אשכול התמצאות במרחב"}]},{"id":"g-ya","year":"י״א","level":"4 יהלו״ם","planTitle":"פריסה שנתית","planUrl":"https://docs.google.com/document/d/1x3VWGC5s9a45mN2pB9UzVkmLO0YOrY2WM7v2bB5RGlw/edit?tab=t.0","extras":[{"id":"e-formulas","title":"דף נוסחאות","url":"https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativa-Elyona/new-curriculum/4-MATH-Formula_NEW.pdf"},{"id":"e-classroom","title":"קלאסרום","url":"https://classroom.google.com/u/1/c/MTYyNjUyNTMyMDQ2"}],"books":[{"title":"יואל גבע - כרך א","url":"https://my.geva.co.il/flippbooks/471A_11_grade/index.html","topics":"מעגל, משפט סינוסים"},{"title":"יואל גבע - כרך ב","url":"https://my.geva.co.il/flippbooks/471d/index.html","topics":"חדו\"א"},{"title":"יואל גבע - כרך ג","url":"https://my.geva.co.il/flippbooks/471_c/index.html","topics":"סטטיסטיקה והסתברות"}]},{"id":"g-yb","year":"י״ב","level":"3 יח״ל","planTitle":"פריסה שנתית","planUrl":"https://docs.google.com/document/d/1lI9TL0h2EeSY4Fy9fCnH-8FvN0ZDzOxWBCI-9bAJwFI/edit?tab=t.0","extras":[{"id":"e-formulas","title":"דף נוסחאות","url":"https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativa-Elyona/new-curriculum/3-MATH-Formula_NEW.pdf"},{"id":"e-classroom","title":"קלאסרום","url":"https://classroom.google.com/u/1/c/MjUzMTk0OTE0MjNa"}],"books":[{"title":"יואל גבע - חלק א","url":"https://my.geva.co.il/flippbooks/372a/index.html","topics":"אנליטית\nתכנון לינארי\nמודל ריבועי"},{"title":"יואל גבע - חלק ב","url":"https://my.geva.co.il/flippbooks/372B/index.html","topics":"התפלגות נורמלית\nגאומטריה במרחב\nראייה מרחבית"},{"title":"חוברת בגרויות","url":"https://my.geva.co.il/flippbooks/372/index.html","topics":""}]}]}
+  </script>
+
+  <script>
+    const STORE = "brenner-dashboard-v1";
+    const STORE_ALIASES = [STORE, "brenner-dashboard:" + location.pathname];
+    const TONES = ["#c45c26", "#1f6f6a", "#3d4f8a", "#8a5a1f"];
+    const ICONS = {
+      classroom: '<path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+      formulas: '<path d="M6 18c3-7 9-7 12 0" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M9 8.5a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+      plan: '<path d="M7 4h7l4 4v12H7V4Z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M14 4v4h4M9 13h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+      book: '<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4H19v14H7.5A2.5 2.5 0 0 0 5 20.5V6.5Z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 8h8M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+      extra: '<path d="M10 6h10M10 12h10M10 18h10M5 6h.01M5 12h.01M5 18h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+    };
+
+    const defaultState = () => ({
+      updatedAt: 0,
+      mashov: "",
+      globalLinks: [],
+      groups: [
+        Object.assign(group("ט׳", "הקבצה ב׳"), { id: "g-t" }),
+        Object.assign(group("י׳", "3 יח״ל"), { id: "g-y" }),
+        Object.assign(group("י״א", "4 יהלו״ם"), { id: "g-ya" }),
+        Object.assign(group("י״ב", "3 יח״ל"), { id: "g-yb" })
+      ]
+    });
+
+    function blankGlobalLink() {
+      return { id: uid("l"), title: "", url: "" };
+    }
+
+    function normalizeGlobalLinks(raw) {
+      if (!raw || !Array.isArray(raw.globalLinks)) return [];
+      return raw.globalLinks.map((item) => ({
+        id: (item && item.id) || uid("l"),
+        title: (item && item.title) || "",
+        url: (item && item.url) || ""
+      }));
+    }
+
+    function uid(prefix) {
+      return prefix + Math.random().toString(36).slice(2, 8);
+    }
+
+    function defaultExtras() {
+      return [
+        { id: "e-formulas", title: "דף נוסחאות", url: "" },
+        { id: "e-classroom", title: "קלאסרום", url: "" }
+      ];
+    }
+
+    function blankBook() {
+      return { title: "", url: "", topics: "" };
+    }
+
+    function group(year, level) {
+      return {
+        id: uid("g"),
+        year,
+        level,
+        planTitle: "פריסה שנתית",
+        planUrl: "",
+        extras: defaultExtras(),
+        books: []
+      };
+    }
+
+    function normalizeExtras(raw) {
+      if (raw && Array.isArray(raw.extras)) {
+        return raw.extras.map((item) => ({
+          id: (item && item.id) || uid("e"),
+          title: (item && item.title) || "",
+          url: (item && item.url) || ""
+        }));
+      }
+      const extras = defaultExtras();
+      extras[0].url = (raw && raw.formulas) || "";
+      extras[1].url = (raw && raw.classroom) || "";
+      return extras;
+    }
+
+    function normalizeGroup(raw) {
+      const blank = group("", "");
+      const books = Array.isArray(raw && raw.books) ? raw.books : [];
+      return {
+        id: (raw && raw.id) || blank.id,
+        year: (raw && raw.year) || "",
+        level: (raw && raw.level) || "",
+        planTitle: (raw && raw.planTitle) || "פריסה שנתית",
+        planUrl: (raw && raw.planUrl) || "",
+        extras: normalizeExtras(raw),
+        books: books.map((b) => ({
+          title: (b && b.title) || "",
+          url: (b && b.url) || "",
+          topics: (b && b.topics) || ""
+        }))
+      };
+    }
+
+    function normalizeState(raw) {
+      const base = defaultState();
+      if (!raw || !Array.isArray(raw.groups) || !raw.groups.length) {
+        return {
+          updatedAt: (raw && raw.updatedAt) || 0,
+          mashov: (raw && raw.mashov) || "",
+          globalLinks: normalizeGlobalLinks(raw),
+          groups: base.groups
+        };
+      }
+      return {
+        updatedAt: raw.updatedAt || 0,
+        mashov: raw.mashov || "",
+        globalLinks: normalizeGlobalLinks(raw),
+        groups: raw.groups.map(normalizeGroup)
+      };
+    }
+
+    function readEmbedded() {
+      const el = document.getElementById("embedded-settings");
+      if (!el) return null;
+      try {
+        const text = el.textContent.trim();
+        return text ? normalizeState(JSON.parse(text)) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function serializeSettings(snapshot) {
+      return JSON.stringify(snapshot).replace(/</g, "\\u003c");
+    }
+
+    function settingsJson() {
+      return serializeSettings(state);
+    }
+
+    function writeEmbeddedTag() {
+      const el = document.getElementById("embedded-settings");
+      if (el) el.textContent = settingsJson();
+    }
+
+    function filled(value) {
+      return String(value || "").trim();
+    }
+
+    function richness(snapshot) {
+      if (!snapshot) return 0;
+      let n = 0;
+      if (filled(snapshot.mashov)) n += 5;
+      (snapshot.globalLinks || []).forEach((link) => { if (filled(link.url)) n += 2; });
+      (snapshot.groups || []).forEach((g) => {
+        if (filled(g.planUrl)) n += 2;
+        (g.extras || []).forEach((x) => { if (filled(x.url)) n += 2; });
+        (g.books || []).forEach((b) => {
+          if (filled(b.url)) n += 2;
+          if (filled(b.topics)) n += 0.5;
+        });
+      });
+      return n;
+    }
+
+    function isPopulated(snapshot) {
+      return richness(snapshot) >= 2;
+    }
+
+    function pickState(a, b) {
+      const items = [a, b].filter(Boolean);
+      if (!items.length) return defaultState();
+      const filledItems = items.filter(isPopulated);
+      if (filledItems.length === 1) return filledItems[0];
+      if (filledItems.length === 2) {
+        const newer = (filledItems[0].updatedAt || 0) >= (filledItems[1].updatedAt || 0) ? filledItems[0] : filledItems[1];
+        const older = newer === filledItems[0] ? filledItems[1] : filledItems[0];
+        return mergePreferFilled(newer, older);
+      }
+      const edited = items.filter((item) => (item.updatedAt || 0) > 0);
+      const pool = edited.length ? edited : items;
+      return pool.sort((x, y) => (y.updatedAt || 0) - (x.updatedAt || 0))[0];
+    }
+
+    function mergeItem(primary, fallback, keys) {
+      const out = Object.assign({}, fallback || {}, primary || {});
+      (keys || []).forEach((key) => {
+        if (!filled((primary || {})[key]) && filled((fallback || {})[key])) out[key] = fallback[key];
+      });
+      return out;
+    }
+
+    function mergeLists(primary, fallback, keys) {
+      const a = primary || [];
+      const b = fallback || [];
+      const max = Math.max(a.length, b.length);
+      const out = [];
+      for (let i = 0; i < max; i++) {
+        if (a[i] && b[i]) out.push(mergeItem(a[i], b[i], keys));
+        else out.push(a[i] || b[i]);
+      }
+      return out;
+    }
+
+    function linkKey(item) {
+      if (filled(item && item.url)) return "u:" + String(item.url).trim();
+      if (item && item.id) return "i:" + item.id;
+      if (filled(item && item.title)) return "t:" + String(item.title).trim();
+      return "";
+    }
+
+    function mergeGlobalLinks(primary, fallback) {
+      const map = new Map();
+      (fallback || []).concat(primary || []).forEach((item) => {
+        const key = linkKey(item);
+        if (!key) return;
+        const prev = map.get(key);
+        map.set(key, prev ? mergeItem(item, prev, ["title", "url", "id"]) : Object.assign({}, item));
+      });
+      const seen = new Set();
+      const out = [];
+      (primary || []).concat(fallback || []).forEach((item) => {
+        const key = linkKey(item);
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        out.push(map.get(key));
+      });
+      return out;
+    }
+
+    function groupKey(g) {
+      const yearLevel = `${g.year || ""}|${g.level || ""}`;
+      if (yearLevel !== "|") return yearLevel;
+      return g.id || "";
+    }
+
+    function mergeGroups(primary, fallback) {
+      const map = new Map();
+      (fallback || []).forEach((g) => map.set(groupKey(g), g));
+      const used = new Set();
+      const out = (primary || []).map((g) => {
+        const key = groupKey(g);
+        const other = map.get(key) || (g.id && [...map.values()].find((x) => x.id === g.id));
+        used.add(key);
+        if (g.id) used.add(g.id);
+        if (!other) return g;
+        used.add(groupKey(other));
+        const merged = mergeItem(g, other, ["year", "level", "planTitle", "planUrl"]);
+        merged.extras = mergeLists(g.extras, other.extras, ["title", "url"]);
+        merged.books = mergeLists(g.books, other.books, ["title", "url", "topics"]);
+        return normalizeGroup(merged);
+      });
+      (fallback || []).forEach((g) => {
+        const key = groupKey(g);
+        if (!used.has(key) && !used.has(g.id)) out.push(normalizeGroup(g));
+      });
+      return out;
+    }
+
+    function mergePreferFilled(primary, fallback) {
+      if (!isPopulated(fallback)) return primary;
+      if (!isPopulated(primary)) return fallback;
+      return {
+        updatedAt: Math.max(primary.updatedAt || 0, fallback.updatedAt || 0),
+        mashov: filled(primary.mashov) ? primary.mashov : fallback.mashov,
+        globalLinks: mergeGlobalLinks(primary.globalLinks, fallback.globalLinks),
+        groups: mergeGroups(primary.groups, fallback.groups)
+      };
+    }
+
+    function parseEmbeddedFromText(text) {
+      const match = text.match(/<script type="application\/json" id="embedded-settings">\s*([\s\S]*?)\s*<\/script>/);
+      if (!match) return null;
+      try {
+        return normalizeState(JSON.parse(match[1]));
+      } catch {
+        return null;
+      }
+    }
+
+    function readLocal() {
+      let best = null;
+      STORE_ALIASES.forEach((key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          const data = normalizeState(JSON.parse(raw));
+          if (!best || (data.updatedAt || 0) >= (best.updatedAt || 0)) best = data;
+        } catch {}
+      });
+      return best;
+    }
+
+    function writeLocal() {
+      try {
+        const payload = JSON.stringify(state);
+        STORE_ALIASES.forEach((key) => localStorage.setItem(key, payload));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    const HANDLE_DB = "brenner-dashboard-file";
+    const HANDLE_STORE = "handles";
+    const HANDLE_KEY = "html";
+    let fileHandle = null;
+    let fileWriteTimer = null;
+    let knownDisk = readEmbedded();
+    let fileWriteInFlight = false;
+
+    function supportsFileApi() {
+      return Boolean(window.showOpenFilePicker || window.showSaveFilePicker);
+    }
+
+    function cloneState(snapshot) {
+      return normalizeState(JSON.parse(JSON.stringify(snapshot)));
+    }
+
+    function isFileSynced() {
+      if (!isPopulated(state)) return true;
+      if (!knownDisk) return false;
+      if ((state.updatedAt || 0) > (knownDisk.updatedAt || 0)) return false;
+      return richness(knownDisk) >= richness(state);
+    }
+
+    function needsFileSave() {
+      return isPopulated(state) && !isFileSynced();
+    }
+
+    function saveActionLabel() {
+      if (fileHandle) return "שמירה לקובץ";
+      if (supportsFileApi()) return "בחירת קובץ";
+      return "הורדת קובץ מעודכן";
+    }
+
+    function suggestedFileName() {
+      try {
+        const name = decodeURIComponent((location.pathname.split("/").pop() || "").trim());
+        return name.endsWith(".html") ? name : "לוח_בקרה.html";
+      } catch {
+        return "לוח_בקרה.html";
+      }
+    }
+
+    function htmlWithSettingsFromText(text, snapshot) {
+      const json = serializeSettings(snapshot);
+      const re = /(<script type="application\/json" id="embedded-settings">)([\s\S]*?)(<\/script>)/;
+      const next = text.replace(re, (_, open, _body, close) => open + "\n" + json + "\n  " + close);
+      if (!/id="embedded-settings"/.test(text)) throw new Error("missing-embedded");
+      return next;
+    }
+
+    function openHandleDb() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(HANDLE_DB, 1);
+        req.onupgradeneeded = () => {
+          if (!req.result.objectStoreNames.contains(HANDLE_STORE)) {
+            req.result.createObjectStore(HANDLE_STORE);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function storeFileHandle(handle) {
+      const db = await openHandleDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(HANDLE_STORE, "readwrite");
+        tx.objectStore(HANDLE_STORE).put(handle, HANDLE_KEY);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function loadStoredHandle() {
+      try {
+        const db = await openHandleDb();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction(HANDLE_STORE, "readonly");
+          const req = tx.objectStore(HANDLE_STORE).get(HANDLE_KEY);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+      } catch {
+        return null;
+      }
+    }
+
+    async function ensureWritePermission(handle) {
+      const opts = { mode: "readwrite" };
+      if ((await handle.queryPermission(opts)) === "granted") return true;
+      return (await handle.requestPermission(opts)) === "granted";
+    }
+
+    async function pickDashboardFile() {
+      if (window.showOpenFilePicker) {
+        const [handle] = await window.showOpenFilePicker({
+          multiple: false,
+          types: [{ description: "HTML", accept: { "text/html": [".html"] } }]
+        });
+        if (!(await ensureWritePermission(handle))) throw new Error("permission");
+        const text = await (await handle.getFile()).text();
+        if (!/id="embedded-settings"/.test(text)) throw new Error("wrong-file");
+        return handle;
+      }
+      if (window.showSaveFilePicker) {
+        return window.showSaveFilePicker({
+          suggestedName: suggestedFileName(),
+          types: [{ description: "HTML", accept: { "text/html": [".html"] } }]
+        });
+      }
+      throw new Error("unsupported");
+    }
+
+    function applySnapshot(snapshot) {
+      state = snapshot;
+      writeLocal();
+      writeEmbeddedTag();
+      renderBoard();
+      if (settingsEl.classList.contains("on")) renderSettings();
+    }
+
+    function snapshotForDisk(onDisk) {
+      if (isPopulated(onDisk) && !isPopulated(state)) return null;
+      if (!isPopulated(state)) return null;
+      if (isPopulated(onDisk) && richness(state) < richness(onDisk)) {
+        const merged = mergePreferFilled(state, onDisk);
+        merged.updatedAt = Math.max(state.updatedAt || 0, onDisk.updatedAt || 0, Date.now());
+        return merged;
+      }
+      return state;
+    }
+
+    async function writeToLinkedFile() {
+      if (!fileHandle) return false;
+      if (!(await ensureWritePermission(fileHandle))) return false;
+      const text = await (await fileHandle.getFile()).text();
+      const onDisk = parseEmbeddedFromText(text);
+      if (isPopulated(onDisk) && !isPopulated(state)) {
+        knownDisk = onDisk;
+        applySnapshot(onDisk);
+        return "adopted";
+      }
+      const snapshot = snapshotForDisk(onDisk);
+      if (!snapshot) return false;
+      if (snapshot !== state) applySnapshot(snapshot);
+      const html = htmlWithSettingsFromText(text, snapshot);
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      knownDisk = snapshot;
+      writeEmbeddedTag();
+      return true;
+    }
+
+    async function htmlFromCurrentFile() {
+      const res = await fetch(location.href);
+      if (!res.ok) throw new Error("fetch");
+      const text = await res.text();
+      const snapshot = snapshotForDisk(parseEmbeddedFromText(text));
+      if (!snapshot) throw new Error("protect");
+      return htmlWithSettingsFromText(text, snapshot);
+    }
+
+    function downloadHtml(html) {
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = suggestedFileName();
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function scheduleFileWrite() {
+      if (!fileHandle) return;
+      if (!isPopulated(state) && isPopulated(knownDisk)) return;
+      clearTimeout(fileWriteTimer);
+      fileWriteTimer = setTimeout(() => {
+        fileWriteInFlight = true;
+        writeToLinkedFile()
+          .then((ok) => {
+            if (ok === true) setStatus("נשמר לקובץ");
+            else if (ok === "adopted") setStatus("נטען מהקובץ");
+            else setStatus("השמירה לקובץ נחסמה כדי לא לדרוס הגדרות", true);
+            updateSyncBanner();
+            if (settingsEl.classList.contains("on")) renderSettings();
+          })
+          .catch(() => {
+            setStatus("השמירה לקובץ נכשלה — לחצו לשמירה שוב", true);
+            updateSyncBanner();
+            if (settingsEl.classList.contains("on")) renderSettings();
+          })
+          .finally(() => {
+            fileWriteInFlight = false;
+          });
+      }, 800);
+    }
+
+    async function restoreFileHandle() {
+      fileHandle = await loadStoredHandle();
+      if (!fileHandle) return;
+      try {
+        if ((await fileHandle.queryPermission({ mode: "readwrite" })) !== "granted") {
+          fileHandle = null;
+        }
+      } catch {
+        fileHandle = null;
+      }
+    }
+
+    async function downloadUpdatedFile() {
+      downloadHtml(await htmlFromCurrentFile());
+      knownDisk = cloneState(state);
+      writeEmbeddedTag();
+      setStatus("הקובץ ירד. החליפו איתו את הקובץ בתיקייה המשותפת של OneDrive");
+      updateSyncBanner();
+      if (settingsEl.classList.contains("on")) renderSettings();
+    }
+
+    async function linkAndWriteFile() {
+      if (!isPopulated(state) && isPopulated(knownDisk)) {
+        setStatus("לא נשמר לקובץ כדי לא לדרוס הגדרות קיימות", true);
+        return false;
+      }
+      if (!isPopulated(state) && !isPopulated(knownDisk)) {
+        setStatus("אין עדיין קישורים לשמירה לקובץ", true);
+        return false;
+      }
+      try {
+        if (supportsFileApi()) {
+          if (!fileHandle || !(await ensureWritePermission(fileHandle))) {
+            fileHandle = await pickDashboardFile();
+            await storeFileHandle(fileHandle);
+          }
+          const ok = await writeToLinkedFile();
+          if (!ok) {
+            setStatus("לא נשמר לקובץ כדי לא לדרוס הגדרות קיימות", true);
+            updateSyncBanner();
+            if (settingsEl.classList.contains("on")) renderSettings();
+            return false;
+          }
+          setStatus(ok === "adopted" ? "נטען מהקובץ" : "נשמר לקובץ");
+          updateSyncBanner();
+          if (settingsEl.classList.contains("on")) renderSettings();
+          return true;
+        }
+        await downloadUpdatedFile();
+        return true;
+      } catch (err) {
+        if (err && err.name === "AbortError") {
+          setStatus("יש לבחור את הקובץ כדי לשמור בין מכשירים", true);
+          return false;
+        }
+        if (err && err.message === "wrong-file") {
+          setStatus("בחרו את קובץ לוח הבקרה, לא קובץ אחר", true);
+          fileHandle = null;
+          return false;
+        }
+        try {
+          await downloadUpdatedFile();
+          return true;
+        } catch {
+          setStatus("לא ניתן לשמור לקובץ", true);
+          return false;
+        }
+      }
+    }
+
+    let saveStatus = "השינויים חייבים להישמר לקובץ כדי לסנכרן בין מכשירים";
+    let saveErr = false;
+
+    function setStatus(text, err) {
+      saveStatus = text;
+      saveErr = Boolean(err);
+      const el = document.getElementById("save-status");
+      if (el) {
+        el.textContent = saveStatus;
+        el.classList.toggle("err", saveErr);
+      }
+    }
+
+    function persist() {
+      state.updatedAt = Date.now();
+      writeEmbeddedTag();
+      if (!writeLocal()) {
+        setStatus("השמירה נכשלה", true);
+        updateSyncBanner();
+        return;
+      }
+      if (fileHandle) {
+        setStatus("שומר לקובץ…");
+        scheduleFileWrite();
+      } else {
+        setStatus("חובה לשמור לקובץ — אחרת השינוי יישאר רק במכשיר הזה", true);
+      }
+      updateSyncBanner();
+      if (settingsEl.classList.contains("on")) {
+        const btn = document.getElementById("settings-save-file");
+        if (btn) btn.textContent = saveActionLabel();
+      }
+    }
+
+    function loadAll() {
+      const embedded = readEmbedded();
+      const local = readLocal();
+      if (isPopulated(embedded) && isPopulated(local)) {
+        if ((local.updatedAt || 0) > (embedded.updatedAt || 0)) {
+          return mergePreferFilled(local, embedded);
+        }
+        return mergePreferFilled(embedded, local);
+      }
+      return pickState(local, embedded);
+    }
+
+    function updateSyncBanner() {
+      const el = document.getElementById("sync-banner");
+      const text = document.getElementById("sync-banner-text");
+      const btn = document.getElementById("sync-banner-btn");
+      if (!el) return;
+      const show = needsFileSave();
+      el.hidden = !show;
+      if (!show) return;
+      if (text) {
+        text.textContent = fileHandle
+          ? "יש שינויים שממתינים לשמירה לקובץ המשותף."
+          : supportsFileApi()
+            ? "חובה לשמור לקובץ המשותף. בחרו את קובץ לוח הבקרה בתיקיית OneDrive."
+            : "חובה להוריד קובץ מעודכן ולהחליף איתו את הקובץ בתיקיית OneDrive.";
+      }
+      if (btn) btn.textContent = saveActionLabel();
+    }
+
+    let state = defaultState();
+
+    const $ = (sel) => document.querySelector(sel);
+    const groupsEl = $("#groups");
+    const plansBlock = $("#plans-block");
+    const booksBlock = $("#books-block");
+    const linksBlock = $("#links-block");
+    const mashovEl = $("#mashov");
+    const settingsEl = $("#settings");
+    const settingsBody = $("#settings-body");
+    const scrimEl = document.querySelector(".scrim");
+
+    function href(url) {
+      const value = String(url || "").trim();
+      return value || "#";
+    }
+
+    function tile(label, hint, url, icon, extraClass) {
+      const empty = !String(url || "").trim();
+      return `
+        <a class="tile${empty ? " is-empty" : ""}${extraClass ? " " + extraClass : ""}" href="${href(url)}" target="_blank" rel="noopener">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${icon}</svg></span>
+          <strong>${escapeHtml(label)}</strong>
+          <span>${empty ? "טרם הוגדר" : escapeHtml(hint)}</span>
+        </a>`;
+    }
+
+    function snapshotOpen() {
+      return {
+        groups: [...document.querySelectorAll("#groups details.folder[open]")].map((d) => d.dataset.id),
+        groupBooks: [...document.querySelectorAll("#groups details.books-card[open]")].map((d) => d.dataset.id),
+        plans: Boolean(document.querySelector("#plans-block details[open]")),
+        books: Boolean(document.querySelector("#books-block details[open]")),
+        links: Boolean(document.querySelector("#links-block details[open]"))
+      };
+    }
+
+    function groupLabel(g) {
+      return [g.year, g.level].filter(Boolean).join(" · ") || "קבוצה";
+    }
+
+    function bookCards(items) {
+      return items.map((b) => {
+        const topics = String(b.topics || "").trim();
+        return `
+        <a class="card book" style="--tone:${b.tone || "inherit"}" href="${href(b.url)}" target="_blank" rel="noopener">
+          ${b.hint ? `<span>${escapeHtml(b.hint)}</span>` : ""}
+          <strong>${escapeHtml(b.title || "ספר לימוד")}</strong>
+          ${topics ? `<span class="book-tip"><b>נושאי לימוד</b>${escapeHtml(topics).replaceAll("\n", "<br>")}</span>` : ""}
+        </a>`;
+      }).join("");
+    }
+
+    function groupBooks(g) {
+      return (g.books || []).filter((b) => String(b.url || "").trim());
+    }
+
+    function booksTile(g) {
+      const items = groupBooks(g);
+      const empty = !items.length;
+      return `
+        <details class="books-card" data-id="${g.id}">
+          <summary class="tile${empty ? " is-empty" : ""}">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${ICONS.book}</svg></span>
+            <strong>ספרי לימוד</strong>
+            <span>${empty ? "טרם הוגדר" : items.length + " ספרים"}</span>
+          </summary>
+        </details>`;
+    }
+
+    function booksPanel(g, isOpen) {
+      const items = groupBooks(g);
+      if (!items.length) return "";
+      return `<div class="book-grid" data-books-panel="${g.id}" ${isOpen ? "" : "hidden"}>${bookCards(items)}</div>`;
+    }
+
+    function shortcutFolder(opts) {
+      return `
+        <details class="folder shortcut" data-shortcut="${opts.key}" ${opts.open ? "open" : ""} style="--tone:${opts.tone}">
+          <summary class="folder-summary">
+            <span class="folder-tab"></span>
+            <span class="grade" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26">${opts.icon}</svg></span>
+            <div class="folder-copy">
+              <h3>${opts.title}</h3>
+              <p>${opts.hint}</p>
+            </div>
+          </summary>
+          <div class="folder-body">
+            <div class="cards">${opts.body}</div>
+          </div>
+        </details>`;
+    }
+
+    function renderBoard() {
+      const open = snapshotOpen();
+      const mashov = (state.mashov || "").trim();
+      mashovEl.href = href(mashov);
+      mashovEl.classList.toggle("is-empty", !mashov);
+
+      groupsEl.innerHTML = state.groups.map((g, i) => {
+        const tone = TONES[i % TONES.length];
+        return `
+          <details class="folder" data-id="${g.id}" ${open.groups.includes(g.id) ? "open" : ""} style="--tone:${tone}">
+            <summary class="folder-summary">
+              <span class="folder-tab"></span>
+              <span class="grade">${escapeHtml(g.year || "—")}</span>
+              <div class="folder-copy">
+                <h3>${escapeHtml(g.year ? "כיתה " + g.year : "קבוצה")}</h3>
+                <p>${escapeHtml(g.level || "ללא רמה")}</p>
+              </div>
+            </summary>
+            <div class="folder-body">
+              <div class="tiles">
+                ${tile(g.planTitle || "פריסה שנתית", "תכנית הלימוד", g.planUrl, ICONS.plan)}
+                ${(g.extras || []).map((item) => tile(item.title || "קישור", "קישור", item.url, ICONS.extra)).join("")}
+                ${booksTile(g)}
+              </div>
+              ${booksPanel(g, open.groupBooks.includes(g.id))}
+            </div>
+          </details>`;
+      }).join("") || `<p class="empty">אין קבוצות. פתחו את ההגדרות כדי להוסיף.</p>`;
+
+      if (open.groupBooks.length) {
+        open.groupBooks.forEach((id) => {
+          const el = groupsEl.querySelector(`details.books-card[data-id="${id}"]`);
+          if (el) el.open = true;
+        });
+      }
+
+      const plans = state.groups.filter((g) => String(g.planUrl || "").trim());
+      plansBlock.innerHTML = shortcutFolder({
+        key: "plans",
+        open: open.plans,
+        tone: "#1f6f6a",
+        icon: ICONS.plan,
+        title: "פריסות",
+        hint: plans.length ? plans.length + " קבוצות" : "אין פריסות עדיין",
+        body: plans.length
+          ? plans.map((g) => `
+              <a class="card" style="--tone:${TONES[state.groups.indexOf(g) % TONES.length]}" href="${href(g.planUrl)}" target="_blank" rel="noopener">
+                <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${ICONS.plan}</svg></span>
+                <strong>${escapeHtml([g.year, g.level].filter(Boolean).join(" - ") || "קבוצה")}</strong>
+              </a>`).join("")
+          : `<p class="empty">כאן יופיעו הפריסות שיוגדרו לכל קבוצה.</p>`
+      });
+
+      const books = state.groups.flatMap((g, gi) =>
+        (g.books || [])
+          .filter((b) => String(b.url || "").trim())
+          .map((b) => ({ ...b, hint: groupLabel(g), tone: TONES[gi % TONES.length] }))
+      );
+      booksBlock.innerHTML = shortcutFolder({
+        key: "books",
+        open: open.books,
+        tone: "#8a5a1f",
+        icon: ICONS.book,
+        title: "ספרי לימוד",
+        hint: books.length ? books.length + " ספרים" : "אין ספרים עדיין",
+        body: books.length
+          ? bookCards(books)
+          : `<p class="empty">כאן יופיעו ספרי הלימוד שיוגדרו לכל קבוצה.</p>`
+      });
+
+      const globalLinks = (state.globalLinks || []).filter((link) => filled(link.url));
+      linksBlock.innerHTML = shortcutFolder({
+        key: "links",
+        open: open.links,
+        tone: "#3d4f8a",
+        icon: ICONS.extra,
+        title: "קישורים נוספים",
+        hint: globalLinks.length ? globalLinks.length + " קישורים" : "אין קישורים עדיין",
+        body: globalLinks.length
+          ? globalLinks.map((link) => `
+              <a class="card" style="--tone:#3d4f8a" href="${href(link.url)}" target="_blank" rel="noopener">
+                <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${ICONS.extra}</svg></span>
+                <strong>${escapeHtml(link.title || "קישור")}</strong>
+              </a>`).join("")
+          : `<p class="empty">כאן יופיעו קישורים כלליים שאינם שייכים לקבוצה.</p>`
+      });
+      updateSyncBanner();
+    }
+
+    function renderSettings() {
+      const synced = isFileSynced();
+      settingsBody.innerHTML = `
+        <p id="save-status" class="save-status${saveErr || !synced ? " err" : ""}">${synced
+          ? (saveErr ? saveStatus : "ההגדרות מסונכרנות לקובץ המשותף")
+          : saveStatus}</p>
+        <p class="hint-note">${synced
+          ? "הקובץ ב־OneDrive הוא מקור האמת. בסגירת ההגדרות השינויים נשמרים לקובץ אוטומטית."
+          : supportsFileApi()
+            ? "בסגירה השינויים יישמרו לקובץ. בפעם הראשונה בחרו את לוח הבקרה בתיקיית OneDrive — אחר כך זה אוטומטי."
+            : "בסגירה יורד קובץ מעודכן. החליפו איתו את הקובץ ב־OneDrive."}</p>
+        ${synced ? "" : `<div class="file-save-row">
+          <button class="btn" type="button" data-link-file id="settings-save-file">${saveActionLabel()}</button>
+        </div>`}
+        <div class="field">
+          <label for="mashov-url">קישור למשו״ב</label>
+          <input id="mashov-url" data-field="mashov" value="${escapeAttr(state.mashov)}" placeholder="https://..." />
+        </div>
+        <div class="row-actions">
+          <strong>קישורים נוספים</strong>
+          <button class="btn light" type="button" data-add-global-link>הוספת קישור</button>
+        </div>
+        <p class="hint-note">קישורים כלליים — לא משויכים לקבוצה. מופיעים באזור נפרד מתחת לספרי הלימוד.</p>
+        ${(state.globalLinks || []).map((link, li) => `
+          <div class="sub-card">
+            <div class="pair">
+              <div>
+                <label>שם הקישור</label>
+                <input data-global-link="${li}" data-field="title" value="${escapeAttr(link.title)}" placeholder="למשל: אתר משרד החינוך" />
+              </div>
+              <div>
+                <label>קישור</label>
+                <input data-global-link="${li}" data-field="url" value="${escapeAttr(link.url)}" placeholder="https://..." />
+              </div>
+            </div>
+            <div class="row-actions">
+              <span></span>
+              <button class="btn ghost" type="button" data-remove-global-link="${li}">הסר קישור</button>
+            </div>
+          </div>
+        `).join("")}
+        <div class="row-actions">
+          <strong>קבוצות</strong>
+          <button class="btn light" type="button" data-add-group>הוספת קבוצה</button>
+        </div>
+        ${state.groups.map((g, i) => `
+          <article class="group-edit" data-id="${g.id}">
+            <h3>קבוצה ${i + 1}</h3>
+            <div class="pair">
+              <div>
+                <label>שנתון</label>
+                <input data-g="${g.id}" data-field="year" value="${escapeAttr(g.year)}" placeholder="י״א" />
+              </div>
+              <div>
+                <label>רמה</label>
+                <input data-g="${g.id}" data-field="level" value="${escapeAttr(g.level)}" placeholder="4 יהלו״ם" />
+              </div>
+            </div>
+            <div class="pair">
+              <div>
+                <label>שם הפריסה</label>
+                <input data-g="${g.id}" data-field="planTitle" value="${escapeAttr(g.planTitle)}" />
+              </div>
+              <div>
+                <label>קישור לפריסה</label>
+                <input data-g="${g.id}" data-field="planUrl" value="${escapeAttr(g.planUrl)}" placeholder="https://..." />
+              </div>
+            </div>
+            <h4>קישורים נוספים</h4>
+            ${(g.extras || []).map((item, ei) => `
+              <div class="sub-card">
+                <div class="pair">
+                  <div>
+                    <label>שם הקישור</label>
+                    <input data-g="${g.id}" data-extra="${ei}" data-field="title" value="${escapeAttr(item.title)}" placeholder="למשל: קלאסרום" />
+                  </div>
+                  <div>
+                    <label>קישור</label>
+                    <input data-g="${g.id}" data-extra="${ei}" data-field="url" value="${escapeAttr(item.url)}" placeholder="https://..." />
+                  </div>
+                </div>
+                <div class="row-actions">
+                  <span></span>
+                  <button class="btn ghost" type="button" data-remove-extra="${g.id}" data-extra-index="${ei}">הסר קישור</button>
+                </div>
+              </div>
+            `).join("")}
+            <div class="row-actions">
+              <span></span>
+              <button class="btn light" type="button" data-add-extra="${g.id}">הוספת קישור</button>
+            </div>
+            <h4>ספרי לימוד</h4>
+            ${(g.books || []).map((b, bi) => `
+              <div class="sub-card">
+                <div class="pair">
+                  <div>
+                    <label>ספר ${bi + 1} — שם</label>
+                    <input data-g="${g.id}" data-book="${bi}" data-field="title" value="${escapeAttr(b.title)}" />
+                  </div>
+                  <div>
+                    <label>ספר ${bi + 1} — קישור</label>
+                    <input data-g="${g.id}" data-book="${bi}" data-field="url" value="${escapeAttr(b.url)}" placeholder="https://..." />
+                  </div>
+                </div>
+                <div class="field">
+                  <label>נושאי לימוד</label>
+                  <textarea data-g="${g.id}" data-book="${bi}" data-field="topics" placeholder="נושא בכל שורה, או מופרדים בפסיקים">${escapeHtml(b.topics || "")}</textarea>
+                </div>
+                <div class="row-actions">
+                  <span></span>
+                  <button class="btn ghost" type="button" data-remove-book="${g.id}" data-book-index="${bi}">הסר ספר</button>
+                </div>
+              </div>
+            `).join("")}
+            <div class="row-actions">
+              <span></span>
+              <button class="btn light" type="button" data-add-book="${g.id}">הוספת ספר</button>
+            </div>
+            <div class="row-actions">
+              <span></span>
+              <button class="btn ghost" type="button" data-remove="${g.id}">מחק קבוצה</button>
+            </div>
+          </article>
+        `).join("")}
+      `;
+    }
+
+    function findGroup(id) {
+      return state.groups.find((g) => g.id === id);
+    }
+
+    function persistAndPaint() {
+      persist();
+      renderBoard();
+    }
+
+    settingsBody.addEventListener("input", (e) => {
+      const t = e.target;
+      if (t.dataset.field === "mashov") {
+        state.mashov = t.value;
+        persistAndPaint();
+        return;
+      }
+      if (t.dataset.globalLink != null) {
+        const link = (state.globalLinks || [])[Number(t.dataset.globalLink)];
+        if (!link) return;
+        link[t.dataset.field] = t.value;
+        persistAndPaint();
+        return;
+      }
+      const g = findGroup(t.dataset.g);
+      if (!g) return;
+      if (t.dataset.book != null) {
+        g.books[Number(t.dataset.book)][t.dataset.field] = t.value;
+      } else if (t.dataset.extra != null) {
+        g.extras[Number(t.dataset.extra)][t.dataset.field] = t.value;
+      } else {
+        g[t.dataset.field] = t.value;
+      }
+      persistAndPaint();
+    });
+
+    settingsBody.addEventListener("click", (e) => {
+      const add = e.target.closest("[data-add-group]");
+      const remove = e.target.closest("[data-remove]");
+      const addBook = e.target.closest("[data-add-book]");
+      const removeBook = e.target.closest("[data-remove-book]");
+      const addExtra = e.target.closest("[data-add-extra]");
+      const removeExtra = e.target.closest("[data-remove-extra]");
+      const addGlobal = e.target.closest("[data-add-global-link]");
+      const removeGlobal = e.target.closest("[data-remove-global-link]");
+      if (add) {
+        state.groups.push(group("", ""));
+        persistAndPaint();
+        renderSettings();
+      }
+      if (remove) {
+        state.groups = state.groups.filter((g) => g.id !== remove.dataset.remove);
+        persistAndPaint();
+        renderSettings();
+      }
+      if (addBook) {
+        const g = findGroup(addBook.dataset.addBook);
+        if (g) {
+          g.books.push(blankBook());
+          persistAndPaint();
+          renderSettings();
+        }
+      }
+      if (removeBook) {
+        const g = findGroup(removeBook.dataset.removeBook);
+        if (g) {
+          g.books.splice(Number(removeBook.dataset.bookIndex), 1);
+          persistAndPaint();
+          renderSettings();
+        }
+      }
+      if (addExtra) {
+        const g = findGroup(addExtra.dataset.addExtra);
+        if (g) {
+          g.extras.push({ id: uid("e"), title: "", url: "" });
+          persistAndPaint();
+          renderSettings();
+        }
+      }
+      if (removeExtra) {
+        const g = findGroup(removeExtra.dataset.removeExtra);
+        if (g) {
+          g.extras.splice(Number(removeExtra.dataset.extraIndex), 1);
+          persistAndPaint();
+          renderSettings();
+        }
+      }
+      if (addGlobal) {
+        if (!state.globalLinks) state.globalLinks = [];
+        state.globalLinks.push(blankGlobalLink());
+        persistAndPaint();
+        renderSettings();
+      }
+      if (removeGlobal) {
+        state.globalLinks.splice(Number(removeGlobal.dataset.removeGlobalLink), 1);
+        persistAndPaint();
+        renderSettings();
+      }
+    });
+
+    function openSettings() {
+      renderSettings();
+      settingsEl.classList.add("on");
+      scrimEl.classList.add("on");
+      settingsEl.setAttribute("aria-hidden", "false");
+    }
+
+    async function flushFileSave() {
+      clearTimeout(fileWriteTimer);
+      fileWriteTimer = null;
+      if (fileHandle) {
+        fileWriteInFlight = true;
+        try {
+          const ok = await writeToLinkedFile();
+          if (ok === true) setStatus("נשמר לקובץ");
+          else if (ok === "adopted") setStatus("נטען מהקובץ");
+          else return false;
+          return !needsFileSave();
+        } catch {
+          return false;
+        } finally {
+          fileWriteInFlight = false;
+          updateSyncBanner();
+        }
+      }
+      return linkAndWriteFile();
+    }
+
+    async function closeSettings() {
+      if (needsFileSave() || fileWriteInFlight) {
+        setStatus("שומר לקובץ…");
+        const ok = await flushFileSave();
+        if (!ok && needsFileSave()) {
+          setStatus("השמירה לקובץ לא הושלמה — בחרו את הקובץ או נסו שוב", true);
+          renderSettings();
+          const btn = document.getElementById("settings-save-file");
+          if (btn) btn.focus();
+          return;
+        }
+      }
+      settingsEl.classList.remove("on");
+      scrimEl.classList.remove("on");
+      settingsEl.setAttribute("aria-hidden", "true");
+    }
+
+    function groupFolders() {
+      return [...groupsEl.querySelectorAll("details.folder")];
+    }
+
+    function expandAllGroups() {
+      const folders = groupFolders();
+      const openAll = folders.some((folder) => !folder.open);
+      folders.forEach((folder) => { folder.open = openAll; });
+    }
+
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("[data-expand-groups]")) expandAllGroups();
+      if (e.target.closest("[data-open-settings]")) openSettings();
+      if (e.target.closest("[data-close-settings]")) closeSettings();
+      if (e.target.closest("[data-link-file]")) linkAndWriteFile();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeSettings();
+    });
+
+    groupsEl.addEventListener("toggle", (e) => {
+      const card = e.target;
+      if (!card.classList || !card.classList.contains("books-card")) return;
+      const panel = card.closest(".folder-body").querySelector(`[data-books-panel="${card.dataset.id}"]`);
+      if (panel) panel.hidden = !card.open;
+    }, true);
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function escapeAttr(s) {
+      return escapeHtml(s).replaceAll('"', "&quot;");
+    }
+
+    state = loadAll();
+    writeLocal();
+    if (isFileSynced()) knownDisk = cloneState(state);
+    renderBoard();
+    updateSyncBanner();
+    restoreFileHandle().then(async () => {
+      if (fileHandle && needsFileSave()) await writeToLinkedFile();
+      updateSyncBanner();
+      if (settingsEl.classList.contains("on")) renderSettings();
+    });
+  </script>
+</body>
+</html>

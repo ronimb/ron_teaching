@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>תרגול משוואות · פתרונות</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });"></script>
+  <style>
+    :root {
+      --ink: #1a2332;
+      --accent: #1f4e79;
+      --muted: #5a6578;
+      --line: #d8dee8;
+      --ok: #0b6b3a;
+      --font: "David", "Times New Roman", "Segoe UI", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    @page {
+      size: A4;
+      margin: 12mm 14mm;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: var(--ink);
+      font-family: var(--font);
+    }
+    body {
+      padding: 10mm 12mm 14mm;
+      max-width: 210mm;
+      margin-inline: auto;
+      line-height: 1.45;
+      font-size: 12pt;
+    }
+    h1 {
+      margin: 0 0 2mm;
+      text-align: center;
+      font-size: 20pt;
+      color: var(--accent);
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin: 0 0 8mm;
+      font-size: 11pt;
+    }
+    .ex {
+      margin: 0 0 7mm;
+      padding-bottom: 5mm;
+      border-bottom: 1px solid var(--line);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .ex:last-child { border-bottom: none; margin-bottom: 0; }
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.4rem 0.7rem;
+      margin-bottom: 2.5mm;
+    }
+    .num {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 13pt;
+    }
+    .prompt {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-size: 13pt;
+    }
+    .steps {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .steps li {
+      margin: 1.2mm 0;
+    }
+    .math {
+      direction: ltr;
+      unicode-bidi: isolate;
+      display: inline-block;
+    }
+    .ans {
+      margin-top: 2.5mm;
+      font-weight: 700;
+      color: var(--ok);
+    }
+    .katex { direction: ltr; unicode-bidi: isolate; }
+    @media print {
+      body { padding: 0; max-width: none; font-size: 11pt; }
+      h1 { font-size: 18pt; }
+      .ex { margin-bottom: 5mm; padding-bottom: 4mm; }
+    }
+  </style>
+</head>
+<body>
+  <h1>תרגול משוואות · פתרונות</h1>
+  <p class="subtitle">גרסת מורה · דרך מפורטת לכל תרגיל</p>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">1.</span>
+      <span class="prompt">\(6(x+1)-2(x-3)=28\)</span>
+    </div>
+    <ul class="steps">
+      <li>פתיחת סוגריים: <span class="math">\(6x+6-2x+6=28\)</span></li>
+      <li>איסוף איברים דומים: <span class="math">\(4x+12=28\)</span></li>
+      <li>חיסור 12 משני האגפים: <span class="math">\(4x=16\)</span></li>
+      <li>חילוק ב־4: <span class="math">\(x=4\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x=4\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">2.</span>
+      <span class="prompt">\(5(x-2)+3(x+4)=26\)</span>
+    </div>
+    <ul class="steps">
+      <li>פתיחת סוגריים: <span class="math">\(5x-10+3x+12=26\)</span></li>
+      <li>איסוף איברים דומים: <span class="math">\(8x+2=26\)</span></li>
+      <li>חיסור 2 משני האגפים: <span class="math">\(8x=24\)</span></li>
+      <li>חילוק ב־8: <span class="math">\(x=3\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x=3\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">3.</span>
+      <span class="prompt">\(4(2x+1)-3(x-5)=29\)</span>
+    </div>
+    <ul class="steps">
+      <li>פתיחת סוגריים: <span class="math">\(8x+4-3x+15=29\)</span></li>
+      <li>איסוף איברים דומים: <span class="math">\(5x+19=29\)</span></li>
+      <li>חיסור 19 משני האגפים: <span class="math">\(5x=10\)</span></li>
+      <li>חילוק ב־5: <span class="math">\(x=2\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x=2\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">4.</span>
+      <span class="prompt">\((x+3)(x-2)=14\)</span>
+    </div>
+    <ul class="steps">
+      <li>פילוג מורחב: <span class="math">\(x\cdot x+x\cdot(-2)+3\cdot x+3\cdot(-2)=14\)</span></li>
+      <li>פישוט: <span class="math">\(x^{2}-2x+3x-6=14\)</span> → <span class="math">\(x^{2}+x-6=14\)</span></li>
+      <li>העברה לאגף אחד: <span class="math">\(x^{2}+x-20=0\)</span></li>
+      <li>נוסחת השורשים: <span class="math">\(a=1,\ b=1,\ c=-20\)</span></li>
+      <li>דיסקרימיננטה: <span class="math">\(\Delta=1^{2}-4\cdot1\cdot(-20)=81\)</span></li>
+      <li><span class="math">\(x=\dfrac{-1\pm\sqrt{81}}{2}=\dfrac{-1\pm9}{2}\)</span></li>
+      <li><span class="math">\(x_{1}=\dfrac{8}{2}=4,\quad x_{2}=\dfrac{-10}{2}=-5\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x_{1}=4,\quad x_{2}=-5\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">5.</span>
+      <span class="prompt">\(\dfrac{x-3}{2}=13\)</span>
+    </div>
+    <ul class="steps">
+      <li>כפל שני האגפים ב־2: <span class="math">\(x-3=26\)</span></li>
+      <li>חיבור 3 לשני האגפים: <span class="math">\(x=29\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x=29\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">6.</span>
+      <span class="prompt">\(\dfrac{2x+1}{5}=3\)</span>
+    </div>
+    <ul class="steps">
+      <li>כפל שני האגפים ב־5: <span class="math">\(2x+1=15\)</span></li>
+      <li>חיסור 1 משני האגפים: <span class="math">\(2x=14\)</span></li>
+      <li>חילוק ב־2: <span class="math">\(x=7\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x=7\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">7.</span>
+      <span class="prompt">\(\dfrac{3x-6}{4}=6\)</span>
+    </div>
+    <ul class="steps">
+      <li>כפל שני האגפים ב־4: <span class="math">\(3x-6=24\)</span></li>
+      <li>חיבור 6 לשני האגפים: <span class="math">\(3x=30\)</span></li>
+      <li>חילוק ב־3: <span class="math">\(x=10\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x=10\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">8.</span>
+      <span class="prompt">\(x^{2}+5x-14=0\)</span>
+    </div>
+    <ul class="steps">
+      <li>נוסחת השורשים: <span class="math">\(a=1,\ b=5,\ c=-14\)</span></li>
+      <li>דיסקרימיננטה: <span class="math">\(\Delta=5^{2}-4\cdot1\cdot(-14)=25+56=81\)</span></li>
+      <li><span class="math">\(x=\dfrac{-5\pm\sqrt{81}}{2}=\dfrac{-5\pm9}{2}\)</span></li>
+      <li><span class="math">\(x_{1}=\dfrac{4}{2}=2,\quad x_{2}=\dfrac{-14}{2}=-7\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x_{1}=2,\quad x_{2}=-7\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">9.</span>
+      <span class="prompt">\(x^{2}-3x-10=0\)</span>
+    </div>
+    <ul class="steps">
+      <li>נוסחת השורשים: <span class="math">\(a=1,\ b=-3,\ c=-10\)</span></li>
+      <li>דיסקרימיננטה: <span class="math">\(\Delta=(-3)^{2}-4\cdot1\cdot(-10)=9+40=49\)</span></li>
+      <li><span class="math">\(x=\dfrac{-(-3)\pm\sqrt{49}}{2}=\dfrac{3\pm7}{2}\)</span></li>
+      <li><span class="math">\(x_{1}=\dfrac{10}{2}=5,\quad x_{2}=\dfrac{-4}{2}=-2\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x_{1}=5,\quad x_{2}=-2\)</div>
+  </section>
+
+  <section class="ex">
+    <div class="head">
+      <span class="num">10.</span>
+      <span class="prompt">\(x^{2}+4x-12=0\)</span>
+    </div>
+    <ul class="steps">
+      <li>נוסחת השורשים: <span class="math">\(a=1,\ b=4,\ c=-12\)</span></li>
+      <li>דיסקרימיננטה: <span class="math">\(\Delta=4^{2}-4\cdot1\cdot(-12)=16+48=64\)</span></li>
+      <li><span class="math">\(x=\dfrac{-4\pm\sqrt{64}}{2}=\dfrac{-4\pm8}{2}\)</span></li>
+      <li><span class="math">\(x_{1}=\dfrac{4}{2}=2,\quad x_{2}=\dfrac{-12}{2}=-6\)</span></li>
+    </ul>
+    <div class="ans">תשובה: \(x_{1}=2,\quad x_{2}=-6\)</div>
+  </section>
+</body>
+</html>

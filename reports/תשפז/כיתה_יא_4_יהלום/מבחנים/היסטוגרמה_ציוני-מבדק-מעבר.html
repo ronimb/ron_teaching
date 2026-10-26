@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ציוני מבדק מעבר</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --muted: #5a6578;
+    --line: #d8dee8;
+    --paper: #f7f8fb;
+    --card: #ffffff;
+    --accent: #1f4e79;
+    --bar: #2b6ea3;
+    --font: "Segoe UI", "Heebo", "Arial Hebrew", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .sheet {
+    width: min(920px, 100%);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 36px 40px 32px;
+  }
+
+  h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+  }
+
+  .meta {
+    margin: 10px 0 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  .chart-wrap {
+    margin-top: 36px;
+    direction: ltr;
+  }
+
+  .chart {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    grid-template-rows: 320px auto;
+    column-gap: 8px;
+    row-gap: 8px;
+  }
+
+  .y-label {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .plot {
+    grid-row: 1;
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    border-bottom: 2px solid var(--ink);
+    border-left: 2px solid var(--ink);
+    padding: 8px 12px 0 0;
+  }
+
+  .y-ticks {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 8px 0 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bars {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: end;
+    gap: 22px;
+    padding: 0 18px;
+    background-image: repeating-linear-gradient(
+      to top,
+      transparent 0,
+      transparent calc(12.5% - 1px),
+      var(--line) calc(12.5% - 1px),
+      var(--line) 12.5%
+    );
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+  }
+
+  .count {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bar {
+    width: min(72px, 70%);
+    background: var(--bar);
+    border-radius: 3px 3px 0 0;
+    min-height: 0;
+  }
+
+  .bar.zero {
+    height: 3px !important;
+    background: #9aa7b8;
+    border-radius: 1px;
+  }
+
+  .x-axis {
+    grid-row: 2;
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .x-cats {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 22px;
+    padding: 0 18px;
+    text-align: center;
+    font-weight: 650;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .x-label {
+    margin-top: 14px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .sheet { border: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <h1>ציוני מבדק מעבר</h1>
+    <p class="meta">מספר ציונים: 14 · ממוצע: 48.1</p>
+
+    <div class="chart-wrap">
+      <div class="chart">
+        <div class="y-label">מספר תלמידים</div>
+        <div class="plot">
+          <div class="y-ticks" aria-hidden="true">
+            <span>8</span><span>7</span><span>6</span><span>5</span>
+            <span>4</span><span>3</span><span>2</span><span>1</span><span>0</span>
+          </div>
+          <div class="bars">
+            <div class="col">
+              <span class="count">7</span>
+              <div class="bar" style="height: 87.5%"></div>
+            </div>
+            <div class="col">
+              <span class="count">5</span>
+              <div class="bar" style="height: 62.5%"></div>
+            </div>
+            <div class="col">
+              <span class="count">0</span>
+              <div class="bar zero"></div>
+            </div>
+            <div class="col">
+              <span class="count">2</span>
+              <div class="bar" style="height: 25%"></div>
+            </div>
+            <div class="col">
+              <span class="count">0</span>
+              <div class="bar zero"></div>
+            </div>
+          </div>
+        </div>
+        <div class="x-axis">
+          <div></div>
+          <div class="x-cats">
+            <span>0–55</span>
+            <span>56–70</span>
+            <span>70–80</span>
+            <span>80–90</span>
+            <span>90–100</span>
+          </div>
+        </div>
+      </div>
+      <div class="x-label">טווח ציונים</div>
+    </div>
+  </div>
+</body>
+</html>

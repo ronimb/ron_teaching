@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>מחוון · מבדק עבודת קיץ יא 4 יהלום · 10.9.2026</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --muted: #5a6578;
+    --line: #d8dee8;
+    --paper: #f7f8fb;
+    --card: #ffffff;
+    --accent: #1f4e79;
+    --accent-soft: #e8f0f8;
+    --good: #1b7a4e;
+    --good-bg: #e8f6ef;
+    --warn: #9a5b00;
+    --warn-bg: #fff4e0;
+    --bad: #a11f2c;
+    --bad-bg: #fdecee;
+    --shadow: 0 1px 3px rgba(26, 35, 50, 0.08);
+    --radius: 10px;
+    --font: "Segoe UI", "Heebo", "Arial Hebrew", Arial, sans-serif;
+    --mono: "Cascadia Mono", "Consolas", monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+  }
+
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(247, 248, 251, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .app-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 20px 0;
+  }
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .tab {
+    appearance: none;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+  }
+  .tab:hover { color: var(--ink); background: #eef2f7; }
+  .tab.active {
+    color: var(--accent);
+    background: var(--card);
+    border-color: var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .btn {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .btn:hover { border-color: #b8c4d6; }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn.ghost { box-shadow: none; background: transparent; }
+  .btn.danger { color: var(--bad); border-color: #e8b4b9; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .stat .k { font-size: 0.8rem; color: var(--muted); }
+  .stat .v { font-size: 1.35rem; font-weight: 700; color: var(--accent); }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+  .q-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    align-items: baseline;
+    justify-content: flex-start;
+    padding: 14px 16px;
+    background: var(--accent-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .q-head h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--accent);
+  }
+  .q-body { padding: 14px 16px 18px; }
+  .given, .mistakes {
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .mistakes { color: var(--warn); background: var(--warn-bg); padding: 8px 10px; border-radius: 8px; }
+
+  .q-img {
+    width: 100%;
+    max-width: 920px;
+    height: auto;
+    display: block;
+    margin: 0 auto 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .item {
+    border-top: 1px solid var(--line);
+    padding: 12px 0 4px;
+  }
+  .item:first-of-type { border-top: none; padding-top: 0; }
+  .item-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .item-id {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 6px;
+    align-items: baseline;
+  }
+  .item-letter {
+    font-weight: 800;
+    color: var(--accent);
+    min-width: 0;
+  }
+  .item-prompt {
+    flex: 1 1 8rem;
+    min-width: 0;
+    unicode-bidi: isolate;
+  }
+  .item-marks {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 6px 8px;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+  .badge, .answer { flex: 0 0 auto; white-space: nowrap; }
+  .frac {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 0.12em;
+    line-height: 1.05;
+  }
+  .frac .num, .frac .den {
+    display: block;
+    font-size: 0.7em;
+    padding: 0 0.2em;
+    line-height: 1.1;
+  }
+  .frac .num { border-bottom: 1.5px solid currentColor; }
+  .given, .mistakes, .meta-line, .item-prompt-sm, .part-need, .q-head h2 {
+    unicode-bidi: isolate;
+  }
+  .math-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+    font-family: "Cambria Math", "Times New Roman", "Segoe UI", var(--mono);
+  }
+  .answer {
+    font-family: "Cambria Math", "Times New Roman", "Segoe UI", var(--mono);
+    font-size: 0.92rem;
+    direction: ltr;
+    unicode-bidi: isolate;
+    background: #f0f4f9;
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: #163a5c;
+  }
+  .parts {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .parts li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px 10px;
+    align-items: start;
+    padding: 6px 8px;
+    border-radius: 6px;
+  }
+  .parts li:nth-child(odd) { background: #fafbfd; }
+  .part-pts {
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .part-need { color: var(--muted); font-size: 0.9rem; }
+
+  /* —— Grading —— */
+  .grade-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .grade-layout { grid-template-columns: 1fr; }
+    .summary-sticky { position: static !important; }
+  }
+  .summary-sticky {
+    position: sticky;
+    top: 88px;
+  }
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px;
+  }
+  .summary-card h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+  .big-score {
+    text-align: center;
+    padding: 10px 0 14px;
+  }
+  .big-score .num {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .big-score .of { color: var(--muted); font-size: 1rem; }
+  .q-bars { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 14px; }
+  .q-bar-row { display: grid; grid-template-columns: 2.2rem 1fr auto; gap: 8px; align-items: center; font-size: 0.88rem; }
+  .bar-track {
+    height: 8px;
+    background: #e8edf4;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    width: 0%;
+    transition: width 0.15s ease;
+  }
+  .bar-fill.full { background: var(--good); }
+  .bar-fill.low { background: var(--bad); }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .field label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+  .field input, .field textarea, .field select {
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .field textarea { min-height: 70px; resize: vertical; }
+
+  .grade-q { margin-bottom: 16px; }
+  .grade-item {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .grade-item-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f4f7fb;
+    border-bottom: 1px solid var(--line);
+  }
+  .grade-item-head .left { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .quick {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .quick .btn { padding: 4px 10px; font-size: 0.8rem; box-shadow: none; }
+  .grade-parts { padding: 6px 8px 10px; }
+  .grade-part {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 6px;
+    border-radius: 6px;
+  }
+  .grade-part:nth-child(odd) { background: #fafbfd; }
+  .grade-part .meta-line { font-size: 0.85rem; color: var(--muted); }
+  .score-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .score-ctrl input[type="number"] {
+    width: 4.2rem;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    padding: 6px 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #eef2f7;
+    color: var(--muted);
+  }
+  .chip.ok { background: var(--good-bg); color: var(--good); }
+  .chip.partial { background: var(--warn-bg); color: var(--warn); }
+  .chip.zero { background: var(--bad-bg); color: var(--bad); }
+
+  .note-box {
+    margin-top: 8px;
+    padding: 0 12px 12px;
+  }
+  .note-box textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-height: 52px;
+  }
+
+  .footer-note {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  /* —— Grade toolbar / multi-student —— */
+  .grade-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .tb-spacer { flex: 1 1 auto; }
+  .q-nav { display: flex; flex-wrap: wrap; gap: 4px; }
+  .qtab {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .qtab:hover { border-color: #b8c4d6; color: var(--ink); }
+  .qtab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .qtab.done::after { content: " ✓"; color: var(--good); font-weight: 800; }
+  .qtab.active.done::after { color: #cdeadd; }
+  .student-nav { display: flex; align-items: center; gap: 6px; }
+  .student-select {
+    font: inherit;
+    font-weight: 600;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    max-width: 240px;
+  }
+  .btn.mini { padding: 5px 10px; font-size: 0.85rem; box-shadow: none; }
+
+  .grade-layout {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr) 300px;
+    gap: 18px;
+    align-items: start;
+  }
+  .grade-layout.no-summary { grid-template-columns: 340px minmax(0, 1fr); }
+  @media (max-width: 1100px) {
+    .grade-layout, .grade-layout.no-summary { grid-template-columns: 1fr; }
+    .img-float, .summary-wrap { position: static !important; }
+  }
+
+  .img-float { position: sticky; top: 84px; }
+  .img-float-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 10px;
+  }
+  .img-float-title { font-weight: 700; color: var(--accent); font-size: 0.9rem; margin-bottom: 8px; }
+  .img-float-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .summary-wrap { position: sticky; top: 84px; }
+  .summary-actions { display: flex; justify-content: flex-end; margin-top: 4px; }
+
+  /* item final score field + manual override */
+  .item-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .item-final {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding: 3px 6px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+  }
+  .item-final label { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+  .item-final input {
+    width: 3.6rem;
+    font: inherit;
+    font-weight: 800;
+    text-align: center;
+    padding: 5px 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+  .item-final .of-max { font-size: 0.85rem; color: var(--muted); }
+  .item-final.is-override {
+    background: var(--warn-bg);
+    border-color: #f0d6a8;
+  }
+  .item-final.is-override input { border-color: var(--warn); color: var(--warn); background: #fff; }
+  .ovr-tag { font-size: 0.68rem; font-weight: 700; color: var(--warn); }
+  .ovr-reset {
+    appearance: none;
+    border: 1px solid var(--warn);
+    background: #fff;
+    color: var(--warn);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 3px 7px;
+    font-size: 0.8rem;
+    line-height: 1;
+  }
+  .ovr-reset.hidden { display: none; }
+  .item-prompt-sm { font-size: 0.9rem; color: var(--muted); }
+  .grade-item.not-graded .grade-item-head { background: #f9fafc; }
+  .grade-item.is-graded .grade-item-head { background: #eef7f1; }
+
+  /* —— Overview / progress —— */
+  .ov-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+  .ov-table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+  .ov-table th, .ov-table td {
+    border: 1px solid var(--line);
+    padding: 6px 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .ov-corner, .ov-name {
+    text-align: right;
+    position: sticky;
+    right: 0;
+    background: var(--card);
+    z-index: 2;
+  }
+  .ov-qh { background: var(--accent-soft); color: var(--accent); }
+  .ov-ih { background: #f4f7fb; color: var(--muted); font-weight: 700; }
+  .ov-max { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+  .ov-cell { cursor: pointer; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .ov-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .ov-cell.ungraded { color: #c2ccda; font-weight: 400; background: #fbfcfe; }
+  .ov-cell.ok { background: var(--good-bg); color: var(--good); }
+  .ov-cell.partial { background: var(--warn-bg); color: var(--warn); }
+  .ov-cell.zero { background: var(--bad-bg); color: var(--bad); }
+  .ov-cell.ov-override { box-shadow: inset 0 0 0 2px var(--warn); }
+  .ov-total { font-weight: 800; color: var(--accent); }
+  .ov-name { cursor: pointer; font-weight: 600; }
+  .ov-name:hover { color: var(--accent); text-decoration: underline; }
+  .ov-nb { color: var(--muted); font-weight: 400; font-size: 0.8rem; }
+  .ov-prog-bar { height: 6px; background: #e8edf4; border-radius: 999px; overflow: hidden; margin-bottom: 3px; }
+  .ov-prog-bar > div { height: 100%; background: var(--accent); border-radius: 999px; }
+  .ov-foot { background: #f4f7fb; color: var(--muted); font-weight: 600; }
+  .ov-foot.done { background: var(--good-bg); color: var(--good); }
+
+  /* Print */
+  @media print {
+    body { background: #fff; }
+    .app-header { position: static; background: #fff; backdrop-filter: none; }
+    .tabs, .toolbar, .no-print { display: none !important; }
+    .panel { display: none !important; }
+    .panel.active, .panel.print-force { display: block !important; }
+    .q-card, .grade-item, .summary-card { box-shadow: none; break-inside: avoid; }
+    .grade-layout { grid-template-columns: 1fr; }
+    .summary-sticky { position: static; }
+    a { text-decoration: none; color: inherit; }
+    .wrap { padding: 0; max-width: none; }
+  }
+
+  .print-only { display: none; }
+  @media print {
+    body.print-summary .panel-rubric { display: none !important; }
+    body.print-summary .panel-grade { display: block !important; }
+    body.print-summary .grade-main { display: none !important; }
+    body.print-summary .summary-print-full { display: block !important; }
+    body.print-rubric .panel-grade { display: none !important; }
+    body.print-rubric .panel-rubric { display: block !important; }
+  }
+</style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <div class="app-header-inner">
+      <div class="title-row">
+        <h1>מחוון מבדק עבודת קיץ · יא 4 יח״ל יהלום</h1>
+        <div class="meta">10.9.2026 · 100 נק׳ · 3 שאלות חובה</div>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button type="button" class="tab active" id="tab-rubric" data-tab="rubric" role="tab" aria-selected="true">מחוון להדפסה</button>
+        <button type="button" class="tab" id="tab-grade" data-tab="grade" role="tab" aria-selected="false">בדיקת מבחן</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- RUBRIC -->
+  <section class="panel panel-rubric active" id="panel-rubric" role="tabpanel">
+    <div class="wrap">
+      <div class="toolbar no-print">
+        <button type="button" class="btn primary" id="btn-print-rubric">הדפסת מחוון</button>
+        <span class="meta">תמונות מסומנות בתיקייה kayitz-img/ ליד הקובץ.</span>
+      </div>
+
+      <div class="overview-grid">
+        <div class="stat"><div class="k">סה״כ</div><div class="v">100</div></div>
+        <div class="stat"><div class="k">שאלה 1</div><div class="v">45</div></div>
+        <div class="stat"><div class="k">שאלה 2</div><div class="v">45</div></div>
+        <div class="stat"><div class="k">שאלה 3</div><div class="v">10</div></div>
+      </div>
+
+      <div id="rubric-root"></div>
+
+      <p class="footer-note">
+        מחוון לבדיקה פנימית · מבדק עבודת קיץ · יא 4 יח״ל יהלום · 10.9.2026 · בשאלה 1ג הנקודה (0, 0) היא פיתול (לא קיצון)
+      </p>
+    </div>
+  </section>
+
+  <!-- GRADE -->
+  <section class="panel panel-grade" id="panel-grade" role="tabpanel">
+    <div class="wrap">
+      <!-- ===== GRADE VIEW (one question at a time, across students) ===== -->
+      <div id="grade-view">
+        <div class="grade-toolbar no-print">
+          <div class="q-nav" id="q-nav"></div>
+          <div class="tb-spacer"></div>
+          <div class="student-nav">
+            <button type="button" class="btn mini" id="btn-prev-student" title="התלמיד/ה הקודם/ת">‹</button>
+            <select id="student-select" class="student-select" title="בחירת תלמיד/ה"></select>
+            <button type="button" class="btn mini" id="btn-next-student" title="התלמיד/ה הבא/ה">›</button>
+            <button type="button" class="btn" id="btn-add-student">+ תלמיד/ה</button>
+          </div>
+          <button type="button" class="btn" id="btn-toggle-summary">הסתר סיכום</button>
+          <button type="button" class="btn primary" id="btn-overview">מבט־על / מעקב</button>
+        </div>
+
+        <div class="grade-layout" id="grade-layout">
+          <!-- floating question image (right side in RTL) -->
+          <aside class="img-float" id="img-float"></aside>
+          <!-- grading details -->
+          <div class="grade-main" id="grade-root"></div>
+          <!-- collapsible summary (left) -->
+          <aside class="summary-wrap" id="summary-wrap">
+            <div class="summary-card">
+              <h3>סיכום · תלמיד/ה נוכחי/ת</h3>
+              <div class="field">
+                <label for="student-name">שם התלמיד/ה</label>
+                <input id="student-name" type="text" placeholder="שם מלא" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="student-id">מס׳ מחברת / הערה</label>
+                <input id="student-id" type="text" placeholder="אופציונלי" autocomplete="off" />
+              </div>
+              <div class="big-score">
+                <div class="num" id="total-score">0</div>
+                <div class="of">מתוך 100</div>
+              </div>
+              <p class="meta" id="summary-progress" style="text-align:center;margin:0 0 10px"></p>
+              <div class="q-bars" id="q-bars"></div>
+              <div class="field">
+                <label for="global-notes">הערות כלליות</label>
+                <textarea id="global-notes" placeholder="הערות לבדיקה / להחזרה לתלמיד"></textarea>
+              </div>
+              <p class="meta" id="save-hint" style="margin:0 0 10px">נשמר אוטומטית בדפדפן זה.</p>
+              <div class="summary-actions">
+                <button type="button" class="btn danger" id="btn-reset">איפוס מחברת</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- ===== OVERVIEW VIEW (all students, progress by items) ===== -->
+      <div id="overview-view" style="display:none">
+        <div class="grade-toolbar no-print">
+          <button type="button" class="btn primary" id="btn-back-grade">‹ חזרה לבדיקה</button>
+          <h2 style="margin:0;font-size:1.1rem;color:var(--accent)">מבט־על ומעקב התקדמות</h2>
+        </div>
+        <div id="overview-root"></div>
+      </div>
+    </div>
+  </section>
+
+<script>
+const QUESTIONS = [
+  {
+    "id": "q1",
+    "num": "1",
+    "title": "חקירת $f(x) = 3x⁴ − m x³$",
+    "points": 45,
+    "complexity": "בינונית-גבוהה. פרמטר, קיצון מול פיתול, משיק.",
+    "given": "$f(x) = 3x⁴ − m x³$ עוברת בנקודה $(-1, 11)$. מסעיף ב ואילך הציבו $m = 8$, כלומר $f(x) = 3x⁴ − 8x³ = x³(3x − 8)$.",
+    "mistakes": "סימן שגוי בהצבת $(-1)³$ ולכן $m ≠ 8$; סיווג $(0, 0)$ כקיצון במקום פיתול; תחום עלייה שכולל סביבת $x = 0$; שליליות עם שוויון בקצות.",
+    "img": "kayitz-img/q1.png?v=1789196491",
+    "items": [
+      {
+        "letter": "א",
+        "points": 5,
+        "prompt": "ידוע שגרף הפונקציה עובר בנקודה $(-1, 11)$. מצאו את ערכו של הפרמטר $m$.",
+        "finalAnswer": "$m = 8$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "הצבה",
+            "points": 2,
+            "need": "$f(-1) = 3(-1)⁴ − m(-1)³ = 3 + m$"
+          },
+          {
+            "label": "פתרון",
+            "points": 3,
+            "need": "$3 + m = 11$, לכן $m = 8$"
+          }
+        ]
+      },
+      {
+        "letter": "ב",
+        "points": 6,
+        "prompt": "מצאו את שיעורי נקודות החיתוך של הפונקציה עם הצירים.",
+        "finalAnswer": "$(0, 0)$ , $(2\\frac{2}{3}, 0)$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "ציר y",
+            "points": 2,
+            "need": "כאשר $x = 0$ מתקבל $(0, 0)$"
+          },
+          {
+            "label": "פירוק",
+            "points": 2,
+            "need": "$x³(3x − 8) = 0$"
+          },
+          {
+            "label": "ציר x",
+            "points": 2,
+            "need": "$(0, 0)$ וגם $(2\\frac{2}{3}, 0)$ (שתיים ושני שליש)"
+          }
+        ]
+      },
+      {
+        "letter": "ג",
+        "points": 8,
+        "prompt": "מצאו את שיעורי הנקודות בהן הנגזרת מתאפסת וציינו את סוג הנקודה (מינימום / מקסימום / פיתול).",
+        "finalAnswer": "מינ׳ $(2, -16)$ · פיתול $(0, 0)$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "נגזרת",
+            "points": 2,
+            "need": "$f'(x) = 12x³ − 24x² = 12x²(x − 2)$"
+          },
+          {
+            "label": "פתרון",
+            "points": 2,
+            "need": "$x = 0$ או $x = 2$, כלומר $(0, 0)$ וגם $(2, -16)$"
+          },
+          {
+            "label": "מינימום",
+            "points": 2,
+            "need": "כאשר $x = 2$ הנגזרת מחליפה מסימן שלילי לחיובי, לכן מינימום $(2, -16)$"
+          },
+          {
+            "label": "פיתול",
+            "points": 2,
+            "need": "כאשר $x = 0$ הנגזרת אינה מחליפה סימן; $f''$ מחליפה סימן, לכן פיתול $(0, 0)$. אין מקסימום."
+          }
+        ]
+      },
+      {
+        "letter": "ד",
+        "points": 5,
+        "prompt": "מהו תחום העלייה של הפונקציה?",
+        "finalAnswer": "$x ≥ 2$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "סימני נגזרת",
+            "points": 2,
+            "need": "$f' < 0$ כאשר $x < 2$ (פרט ל־$x = 0$). $f' > 0$ כאשר $x > 2$"
+          },
+          {
+            "label": "תחום",
+            "points": 3,
+            "need": "עלייה לכל $x ≥ 2$ (או $[2, ∞)$)"
+          }
+        ]
+      },
+      {
+        "letter": "ה",
+        "points": 5,
+        "prompt": "שרטטו סקיצה של הפונקציה.",
+        "finalAnswer": "סקיצה למטה",
+        "answerInline": false,
+        "parts": [
+          {
+            "label": "קיצון",
+            "points": 2,
+            "need": "סימון מינימום $(2, -16)$"
+          },
+          {
+            "label": "חיתוכים / פיתול",
+            "points": 2,
+            "need": "$(0, 0)$ וגם $(2\\frac{2}{3}, 0)$"
+          },
+          {
+            "label": "צורה",
+            "points": 1,
+            "need": "ירידה עד $x = 2$ ואז עלייה; אופקית בראשית"
+          }
+        ],
+        "detailAnswer": "פולינום ממעלה 4, מקדם מוביל חיובי. פיתול אופקי בנקודה $(0, 0)$, מינימום בנקודה $(2, -16)$, חיתוך נוסף עם ציר $x$ בנקודה $(2\\frac{2}{3}, 0)$ (שתיים ושני שליש). כאשר $x < 0$ הגרף חיובי ויורד אל הראשית."
+      },
+      {
+        "letter": "ו",
+        "points": 5,
+        "prompt": "מהו תחום השליליות של הפונקציה?",
+        "finalAnswer": "$0 < x < 2\\frac{2}{3}$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "סימנים",
+            "points": 2,
+            "need": "$x³(3x − 8) < 0$ כאשר $0 < x < 2\\frac{2}{3}$"
+          },
+          {
+            "label": "תחום",
+            "points": 3,
+            "need": "$0 < x < 2\\frac{2}{3}$ (בלי הקצוות: שם $f = 0$)"
+          }
+        ]
+      },
+      {
+        "letter": "ז",
+        "points": 6,
+        "prompt": "הפונקציה $f(x)$ עוברת בנקודה שבה $x = 1$. מצאו את שיעורי הנקודה ואת שיפוע המשיק בנקודה.",
+        "finalAnswer": "$(1, -5)$ , $m = -12$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "נקודה",
+            "points": 3,
+            "need": "$f(1) = 3 − 8 = -5$, כלומר $(1, -5)$"
+          },
+          {
+            "label": "שיפוע",
+            "points": 3,
+            "need": "$f'(1) = 12(1)²(1 − 2) = -12$"
+          }
+        ]
+      },
+      {
+        "letter": "ח",
+        "points": 5,
+        "prompt": "מצאו את משוואת המשיק לפונקציה כאשר $x = 1$.",
+        "finalAnswer": "$y = -12x + 7$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "נוסחה",
+            "points": 2,
+            "need": "$y + 5 = -12(x − 1)$"
+          },
+          {
+            "label": "משוואה",
+            "points": 3,
+            "need": "$y = -12x + 7$"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "q2",
+    "num": "2",
+    "title": "חקירת $y = 2x(x − 3)²$",
+    "points": 45,
+    "complexity": "בינונית. קיצון, חיתוכים, סקיצה, סימני נגזרת.",
+    "given": "$y = 2x(x − 3)² = 2x³ − 12x² + 18x$",
+    "mistakes": "החסרת המינימום $(3, 0)$; היפוך מקס/מינ'; תחום $f' > 0$ בתוך $(1, 3)$; שכחת $x = 3$ בסעיף ה.",
+    "img": "kayitz-img/q2.png?v=1789196491",
+    "items": [
+      {
+        "letter": "א",
+        "points": 12,
+        "prompt": "מצאו את שיעורי נקודות הקיצון של הפונקציה ואת סוגן.",
+        "finalAnswer": "מקס׳ $(1, 8)$ · מינ׳ $(3, 0)$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "נגזרת",
+            "points": 3,
+            "need": "$y' = 6(x − 1)(x − 3)$"
+          },
+          {
+            "label": "נקודות",
+            "points": 5,
+            "need": "$(1, 8)$ וגם $(3, 0)$"
+          },
+          {
+            "label": "סוגים",
+            "points": 4,
+            "need": "מקסימום בנקודה $(1, 8)$; מינימום בנקודה $(3, 0)$"
+          }
+        ]
+      },
+      {
+        "letter": "ב",
+        "points": 8,
+        "prompt": "מצאו את שיעורי נקודות החיתוך של הפונקציה עם הצירים.",
+        "finalAnswer": "$(0, 0)$ , $(3, 0)$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "ציר y",
+            "points": 3,
+            "need": "$(0, 0)$"
+          },
+          {
+            "label": "ציר x",
+            "points": 5,
+            "need": "$2x(x − 3)² = 0$, כלומר $(0, 0)$ וגם $(3, 0)$ (שורש כפול)"
+          }
+        ]
+      },
+      {
+        "letter": "ג",
+        "points": 8,
+        "prompt": "שרטטו סקיצה של הפונקציה.",
+        "finalAnswer": "סקיצה למטה",
+        "answerInline": false,
+        "parts": [
+          {
+            "label": "קיצון",
+            "points": 3,
+            "need": "מקס׳ $(1, 8)$ ומינ׳ $(3, 0)$"
+          },
+          {
+            "label": "חיתוכים",
+            "points": 3,
+            "need": "$(0, 0)$ וגם $(3, 0)$"
+          },
+          {
+            "label": "צורה",
+            "points": 2,
+            "need": "עלייה / ירידה / עלייה; נגיעה בציר $x$ כאשר $x = 3$"
+          }
+        ],
+        "detailAnswer": "פונקציה ממעלה 3, מקדם מוביל חיובי. עוברת בראשית, מקסימום בנקודה $(1, 8)$, נוגעת בציר $x$ במינימום $(3, 0)$ וממשיכה לעלות."
+      },
+      {
+        "letter": "ד",
+        "points": 9,
+        "prompt": "עבור אילו ערכי $x$ הנגזרת חיובית?",
+        "finalAnswer": "$x < 1$ או $x > 3$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "סימנים",
+            "points": 4,
+            "need": "$y' = 6(x − 1)(x − 3)$; חיובית מחוץ לשורשים"
+          },
+          {
+            "label": "תחום",
+            "points": 5,
+            "need": "$x < 1$ או $x > 3$ (בלי $x = 1$, $x = 3$)"
+          }
+        ]
+      },
+      {
+        "letter": "ה",
+        "points": 8,
+        "prompt": "עבור אילו ערכי $x$ שיפוע המשיק לפונקציה יהיה 0?",
+        "finalAnswer": "$x = 1$ , $x = 3$",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "זיהוי",
+            "points": 3,
+            "need": "שיפוע 0 אם ורק אם $y' = 0$"
+          },
+          {
+            "label": "ערכים",
+            "points": 5,
+            "need": "$x = 1$ וגם $x = 3$"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "q3",
+    "num": "3",
+    "title": "זיהוי גרף הנגזרת $h'(x)$",
+    "points": 10,
+    "complexity": "נמוכה-בינונית. קשר גרפי בין פונקציה לנגזרת. בלי נימוק — 0.",
+    "given": "נתון גרף $h(x)$: מקסימום מקומי משמאל לציר $y$, מינימום מקומי ליד ציר $y$ (עדיין $y > 0$), ואז עלייה.",
+    "mistakes": "בחירת א (בלבול $h$ עם $h'$, או היפוך מקס/מינ'); בחירת ב (אין ירידה); בחירת ד (קיצון יחיד); תשובה בלי נימוק.",
+    "img": "kayitz-img/q3.png?v=1789196491",
+    "items": [
+      {
+        "letter": "א",
+        "points": 10,
+        "prompt": "אילו מבין ארבעת הסרטוטים יכול לתאר את $h'(x)$? נמקו. תשובה ללא נימוק לא תקבל נקודות.",
+        "finalAnswer": "ג",
+        "answerInline": true,
+        "parts": [
+          {
+            "label": "בחירה",
+            "points": 4,
+            "need": "גרף ג"
+          },
+          {
+            "label": "נימוק",
+            "points": 6,
+            "need": "מקסימום ואז מינימום ב-$h$, לכן $h'$ משנה סימן מחיובי לשלילי ושוב לחיובי."
+          }
+        ],
+        "detailAnswer": "לפונקציה $h$ יש מקסימום ואז מינימום, לכן $h'$ משנה סימן מחיובי לשלילי ושוב לחיובי — זה גרף ג."
+      }
+    ]
+  }
+];
+
+const EXAM_ID = "yahalom-summer-2026-09-10";
+const STORAGE_KEY = "exam-grade::" + EXAM_ID + "::v2";
+const LEGACY_KEY = "yahalom-exam-grade-v1";
+
+function pts(n) {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** Isolate each $...$ formula as one LTR span. Mixed numbers use a stacked fraction bar. */
+function wrapMath(s) {
+  return String(s).replace(/\$([^$]*)\$/g, (_, inner) => {
+    inner = inner.replace(/(\d+)\\frac\{([^}]+)\}\{([^}]+)\}/g, (_, w, n, d) =>
+      w + '<span class="frac"><span class="num">' + n + '</span><span class="den">' + d + "</span></span>");
+    inner = inner.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, (_, n, d) =>
+      '<span class="frac"><span class="num">' + n + '</span><span class="den">' + d + "</span></span>");
+    return '<span class="math-ltr" dir="ltr">' + inner + "</span>";
+  });
+}
+
+function em(s) {
+  return wrapMath(esc(s));
+}
+
+function answerChips(it) {
+  const raw = it.finalAnswer;
+  const parts = Array.isArray(raw)
+    ? raw
+    : String(raw).split(/\s*·\s*/).filter(Boolean);
+  return parts.map((a) => '<span class="answer">' + em(a) + "</span>").join("");
+}
+
+function partKey(qId, itemIdx, partIdx) {
+  return qId + ":" + itemIdx + ":" + partIdx;
+}
+
+/* —— Tabs —— */
+function setTab(name) {
+  document.querySelectorAll(".tab").forEach((t) => {
+    const on = t.dataset.tab === name;
+    t.classList.toggle("active", on);
+    t.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.getElementById("panel-rubric").classList.toggle("active", name === "rubric");
+  document.getElementById("panel-grade").classList.toggle("active", name === "grade");
+  document.body.classList.remove("print-rubric", "print-summary");
+}
+
+document.querySelectorAll(".tab").forEach((btn) => {
+  btn.addEventListener("click", () => setTab(btn.dataset.tab));
+});
+
+/* —— Rubric render —— */
+function renderRubric() {
+  const root = document.getElementById("rubric-root");
+  root.innerHTML = QUESTIONS.map((q) => {
+    const itemsHtml = q.items
+      .map(
+        (it) => `
+      <div class="item">
+        <div class="item-head">
+          <span class="item-id">
+            <span class="item-letter">(${esc(it.letter)})</span>
+            <span class="badge">${pts(it.points)} נק׳</span>
+          </span>
+          <span class="item-prompt">${em(it.prompt)}</span>
+          <span class="item-marks">${answerChips(it)}</span>
+        </div>
+        ${it.detailAnswer ? `<p class="given">${em(it.detailAnswer)}</p>` : ""}
+        <ul class="parts">
+          ${it.parts
+            .map(
+              (p) => `
+            <li>
+              <span class="part-pts">${pts(p.points)}</span>
+              <span><strong>${em(p.label)}</strong><div class="part-need">${em(p.need)}</div></span>
+              <span></span>
+            </li>`
+            )
+            .join("")}
+        </ul>
+      </div>`
+      )
+      .join("");
+
+    return `
+    <article class="q-card" id="rubric-${q.id}">
+      <div class="q-head">
+        <h2>שאלה ${esc(q.num)} · ${em(q.title)}</h2>
+        <span class="badge">${pts(q.points)} נק׳</span>
+      </div>
+      <div class="q-body">
+        <p class="given"><strong>נתון / הערה:</strong> ${em(q.given)} · ${em(q.complexity)}</p>
+        <img class="q-img" src="${esc(q.img)}" alt="שאלה ${esc(q.num)} מסומנת" loading="lazy"
+          onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<p class=\\'meta\\'>לא נמצאה תמונה מסומנת (${esc(q.img)})</p>');" />
+        ${itemsHtml}
+        <p class="mistakes"><strong>טעויות נפוצות:</strong> ${em(q.mistakes)}</p>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+/* —— Grade state (multi-student store, one exam) —— */
+function itemKey(qId, itemIdx) { return qId + ":" + itemIdx; }
+function makeSid(n) { return "s" + n; }
+
+function newStudent(sid, name) {
+  return {
+    id: sid,
+    name: name || "",
+    notebook: "",
+    scores: {},    // partKey -> number (absent = לא נבדק)
+    overrides: {}, // itemKey -> number (ציון סעיף שנקבע ידנית)
+    graded: {},    // itemKey -> true (הסעיף נבדק)
+    notes: {},     // qId -> text
+    globalNotes: "",
+  };
+}
+
+function blankData() {
+  return {
+    version: 2,
+    seq: 0,
+    students: {},
+    order: [],
+    ui: { currentQ: QUESTIONS[0].id, currentStudent: null, summaryHidden: false },
+  };
+}
+
+function migrateLegacy(data) {
+  try {
+    const raw = localStorage.getItem(LEGACY_KEY);
+    if (!raw) return;
+    const old = JSON.parse(raw);
+    const sid = makeSid(++data.seq);
+    const rec = newStudent(sid, old.name || "");
+    rec.notebook = old.id || "";
+    rec.notes = old.notes || {};
+    rec.globalNotes = old.globalNotes || "";
+    if (old.scores) {
+      rec.scores = { ...old.scores };
+      QUESTIONS.forEach((q) => q.items.forEach((_, ii) => { rec.graded[itemKey(q.id, ii)] = true; }));
+    }
+    data.students[sid] = rec;
+    data.order.push(sid);
+    data.ui.currentStudent = sid;
+  } catch {}
+}
+
+function loadData() {
+  let d;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    d = raw ? JSON.parse(raw) : blankData();
+  } catch { d = blankData(); }
+  d.version = 2;
+  d.seq = d.seq || 0;
+  d.students = d.students || {};
+  d.order = d.order || [];
+  d.ui = d.ui || {};
+  if (d.ui.currentQ == null) d.ui.currentQ = QUESTIONS[0].id;
+  if (d.ui.summaryHidden == null) d.ui.summaryHidden = false;
+  if (!d.order.length) migrateLegacy(d);
+  if (!d.order.length) {
+    const sid = makeSid(++d.seq);
+    d.students[sid] = newStudent(sid, "");
+    d.order.push(sid);
+    d.ui.currentStudent = sid;
+  }
+  if (!d.ui.currentStudent || !d.students[d.ui.currentStudent]) d.ui.currentStudent = d.order[0];
+  return d;
+}
+
+let data = loadData();
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+  const hint = document.getElementById("save-hint");
+  if (hint) hint.textContent = "נשמר · " + new Date().toLocaleTimeString("he-IL");
+}
+
+/* —— accessors —— */
+function curQ() { return QUESTIONS.find((q) => q.id === data.ui.currentQ) || QUESTIONS[0]; }
+function curStudent() { return data.students[data.ui.currentStudent]; }
+
+function clamp(val, max) {
+  const n = Number(val);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  if (n > max) return max;
+  return Math.round(n * 2) / 2; // half points allowed
+}
+
+function itemComputed(rec, q, ii) {
+  let s = 0;
+  q.items[ii].parts.forEach((p, pi) => {
+    const v = rec.scores[partKey(q.id, ii, pi)];
+    if (v != null) s += v;
+  });
+  return Math.round(s * 2) / 2;
+}
+function itemOverride(rec, q, ii) {
+  const v = rec.overrides[itemKey(q.id, ii)];
+  return v == null ? null : v;
+}
+function itemFinal(rec, q, ii) {
+  const o = itemOverride(rec, q, ii);
+  return o == null ? itemComputed(rec, q, ii) : o;
+}
+function isGraded(rec, q, ii) { return !!rec.graded[itemKey(q.id, ii)]; }
+function questionTotal(rec, q) {
+  let s = 0;
+  q.items.forEach((_, ii) => { s += itemFinal(rec, q, ii); });
+  return Math.round(s * 2) / 2;
+}
+function grandTotal(rec) { return QUESTIONS.reduce((s, q) => s + questionTotal(rec, q), 0); }
+function totalItems() { return QUESTIONS.reduce((s, q) => s + q.items.length, 0); }
+function gradedCount(rec) {
+  let c = 0;
+  QUESTIONS.forEach((q) => q.items.forEach((_, ii) => { if (isGraded(rec, q, ii)) c++; }));
+  return c;
+}
+
+function chipClass(earned, max) {
+  if (earned <= 0) return "zero";
+  if (earned >= max) return "ok";
+  return "partial";
+}
+
+/* —— actions —— */
+function markGraded(q, ii) { curStudent().graded[itemKey(q.id, ii)] = true; }
+
+function setItemMode(q, ii, mode) {
+  const rec = curStudent();
+  q.items[ii].parts.forEach((p, pi) => {
+    rec.scores[partKey(q.id, ii, pi)] = mode === "full" ? p.points : 0;
+  });
+  delete rec.overrides[itemKey(q.id, ii)]; // clear manual override; final follows parts
+  markGraded(q, ii);
+  save();
+  renderGrade();
+}
+
+function clearOverride(q, ii) {
+  delete curStudent().overrides[itemKey(q.id, ii)];
+  save();
+  renderGrade();
+}
+
+/* —— render orchestration —— */
+function render() {
+  renderQNav();
+  renderStudentControls();
+  renderGrade();
+  renderImagePanel();
+  applySummaryVisibility();
+  syncStudentFields();
+  updateSummary();
+}
+
+function renderQNav() {
+  const rec = curStudent();
+  const nav = document.getElementById("q-nav");
+  nav.innerHTML = QUESTIONS.map((q) => {
+    const done = q.items.every((_, ii) => isGraded(rec, q, ii));
+    const active = q.id === data.ui.currentQ ? "active" : "";
+    return `<button type="button" class="qtab ${active} ${done ? "done" : ""}" data-qtab="${q.id}">שאלה ${esc(q.num)}</button>`;
+  }).join("");
+  nav.querySelectorAll("[data-qtab]").forEach((b) => b.addEventListener("click", () => {
+    data.ui.currentQ = b.dataset.qtab;
+    save();
+    render();
+  }));
+}
+
+function studentLabel(rec, idx) {
+  const nm = rec.name || ("תלמיד/ה " + (idx + 1));
+  return nm + (rec.notebook ? " · " + rec.notebook : "");
+}
+function renderStudentControls() {
+  const sel = document.getElementById("student-select");
+  sel.innerHTML = data.order.map((sid, i) => {
+    const rec = data.students[sid];
+    return `<option value="${sid}" ${sid === data.ui.currentStudent ? "selected" : ""}>${esc(studentLabel(rec, i))} — ${gradedCount(rec)}/${totalItems()}</option>`;
+  }).join("");
+}
+
+function syncStudentFields() {
+  const rec = curStudent();
+  document.getElementById("student-name").value = rec.name || "";
+  document.getElementById("student-id").value = rec.notebook || "";
+  document.getElementById("global-notes").value = rec.globalNotes || "";
+}
+
+function renderImagePanel() {
+  const q = curQ();
+  const box = document.getElementById("img-float");
+  box.innerHTML = `
+    <div class="img-float-card">
+      <div class="img-float-title">שאלה ${esc(q.num)} · ${em(q.title)}</div>
+      <img src="${esc(q.img)}" alt="שאלה ${esc(q.num)}" loading="lazy"
+        onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<p class=\\'meta\\'>לא נמצאה תמונה (${esc(q.img)})</p>');" />
+    </div>`;
+}
+
+function renderGrade() {
+  const q = curQ();
+  const rec = curStudent();
+  const root = document.getElementById("grade-root");
+
+  const itemsHtml = q.items.map((it, ii) => {
+    const graded = isGraded(rec, q, ii);
+    const overridden = itemOverride(rec, q, ii) != null;
+    const final = itemFinal(rec, q, ii);
+    const showFinal = graded || overridden;
+
+    const parts = it.parts.map((p, pi) => {
+      const k = partKey(q.id, ii, pi);
+      const raw = rec.scores[k];
+      const cv = raw == null ? 0 : raw;
+      return `
+            <div class="grade-part" data-key="${esc(k)}">
+              <div>
+                <strong>${em(p.label)}</strong>
+                <div class="meta-line">${em(p.need)} · תשובה: ${em(it.finalAnswer)}</div>
+              </div>
+              <div class="score-ctrl">
+                <span class="chip ${chipClass(cv, p.points)}">${pts(cv)} / ${pts(p.points)}</span>
+                <input type="number" min="0" max="${p.points}" step="0.5" placeholder="—"
+                  value="${raw == null ? "" : raw}" data-score-key="${esc(k)}" data-item="${ii}" data-max="${p.points}" />
+              </div>
+            </div>`;
+    }).join("");
+
+    return `
+        <div class="grade-item ${graded ? "is-graded" : "not-graded"}" data-q="${q.id}" data-item="${ii}">
+          <div class="grade-item-head">
+            <div class="left">
+              <strong class="item-letter">(${esc(it.letter)})</strong>
+              <span class="item-prompt-sm">${em(it.prompt)}</span>
+            </div>
+            <div class="item-actions no-print">
+              <button type="button" class="btn mini" data-full="${q.id}|${ii}">מלא</button>
+              <button type="button" class="btn mini" data-zero="${q.id}|${ii}">אפס</button>
+              <div class="item-final ${overridden ? "is-override" : ""}">
+                <label>ציון סעיף</label>
+                <input type="number" min="0" max="${it.points}" step="0.5" placeholder="${pts(final)}"
+                  value="${showFinal ? pts(final) : ""}" data-final-item="${ii}" data-max="${it.points}"
+                  title="ציון סופי לסעיף — מחושב אוטומטית, וניתן לדריסה ידנית" />
+                <span class="of-max">/ ${pts(it.points)}</span>
+                ${overridden ? '<span class="ovr-tag">ידני</span>' : ''}
+                <button type="button" class="ovr-reset ${overridden ? "" : "hidden"}" data-ovr-reset="${q.id}|${ii}" title="חזרה לחישוב האוטומטי">↺</button>
+              </div>
+            </div>
+          </div>
+          <div class="grade-parts">${parts}</div>
+        </div>`;
+  }).join("");
+
+  root.innerHTML = `
+    <article class="q-card grade-q">
+      <div class="q-head">
+        <h2>שאלה ${esc(q.num)} · ${em(q.title)}</h2>
+        <span class="badge" id="q-badge">${pts(questionTotal(rec, q))} / ${pts(q.points)}</span>
+      </div>
+      <div class="q-body">
+        <p class="given"><strong>נתון:</strong> ${em(q.given)}</p>
+        <p class="mistakes"><strong>טעויות נפוצות:</strong> ${em(q.mistakes)}</p>
+        <p class="given"><strong>תשובות מפתח:</strong> ${q.items.map((it) => `(${esc(it.letter)}) ${em(it.finalAnswer)}`).join(" · ")}</p>
+        ${itemsHtml}
+        <div class="note-box no-print">
+          <label class="meta" for="note-q">הערות לשאלה ${esc(q.num)} · לתלמיד/ה הנוכחי/ת</label>
+          <textarea id="note-q" data-q-note="${q.id}">${esc(rec.notes[q.id] || "")}</textarea>
+        </div>
+      </div>
+    </article>`;
+
+  bindGradeEvents();
+}
+
+function bindGradeEvents() {
+  const root = document.getElementById("grade-root");
+  root.querySelectorAll("[data-score-key]").forEach((inp) => {
+    inp.addEventListener("input", onPartInput);
+    inp.addEventListener("change", onPartInput);
+  });
+  root.querySelectorAll("[data-final-item]").forEach((inp) => {
+    inp.addEventListener("input", onFinalInput);
+    inp.addEventListener("change", onFinalInput);
+  });
+  root.querySelectorAll("[data-full]").forEach((b) => b.addEventListener("click", () => {
+    const [qId, ii] = b.dataset.full.split("|");
+    setItemMode(QUESTIONS.find((x) => x.id === qId), Number(ii), "full");
+  }));
+  root.querySelectorAll("[data-zero]").forEach((b) => b.addEventListener("click", () => {
+    const [qId, ii] = b.dataset.zero.split("|");
+    setItemMode(QUESTIONS.find((x) => x.id === qId), Number(ii), "zero");
+  }));
+  root.querySelectorAll("[data-ovr-reset]").forEach((b) => b.addEventListener("click", () => {
+    const [qId, ii] = b.dataset.ovrReset.split("|");
+    clearOverride(QUESTIONS.find((x) => x.id === qId), Number(ii));
+  }));
+  const note = root.querySelector("[data-q-note]");
+  if (note) note.addEventListener("input", () => {
+    curStudent().notes[note.dataset.qNote] = note.value;
+    save();
+  });
+}
+
+function onPartInput(e) {
+  const inp = e.target;
+  const rec = curStudent();
+  const q = curQ();
+  const ii = Number(inp.dataset.item);
+  const max = Number(inp.dataset.max);
+  if (inp.value === "") {
+    delete rec.scores[inp.dataset.scoreKey];
+  } else {
+    const v = clamp(inp.value, max);
+    rec.scores[inp.dataset.scoreKey] = v;
+    if (String(v) !== inp.value && document.activeElement !== inp) inp.value = v;
+  }
+  markGraded(q, ii);
+  save();
+  refreshItemInline(q, ii);
+}
+
+function onFinalInput(e) {
+  const inp = e.target;
+  const rec = curStudent();
+  const q = curQ();
+  const ii = Number(inp.dataset.finalItem);
+  const max = Number(inp.dataset.max);
+  if (inp.value === "") {
+    delete rec.overrides[itemKey(q.id, ii)];
+  } else {
+    rec.overrides[itemKey(q.id, ii)] = clamp(inp.value, max);
+  }
+  markGraded(q, ii);
+  save();
+
+  const itemEl = document.querySelector(`.grade-item[data-q="${q.id}"][data-item="${ii}"]`);
+  if (itemEl) {
+    const wrap = itemEl.querySelector(".item-final");
+    const overridden = itemOverride(rec, q, ii) != null;
+    wrap.classList.toggle("is-override", overridden);
+    let tag = wrap.querySelector(".ovr-tag");
+    if (overridden && !tag) {
+      wrap.querySelector(".of-max").insertAdjacentHTML("afterend", '<span class="ovr-tag">ידני</span>');
+    } else if (!overridden && tag) {
+      tag.remove();
+    }
+    const rst = wrap.querySelector(".ovr-reset");
+    if (rst) rst.classList.toggle("hidden", !overridden);
+    itemEl.classList.add("is-graded");
+    itemEl.classList.remove("not-graded");
+  }
+  updateQuestionBadge(q);
+  updateSummary();
+}
+
+function refreshItemInline(q, ii) {
+  const rec = curStudent();
+  const itemEl = document.querySelector(`.grade-item[data-q="${q.id}"][data-item="${ii}"]`);
+  if (itemEl) {
+    itemEl.classList.toggle("is-graded", isGraded(rec, q, ii));
+    itemEl.classList.toggle("not-graded", !isGraded(rec, q, ii));
+    q.items[ii].parts.forEach((p, pi) => {
+      const k = partKey(q.id, ii, pi);
+      const v = rec.scores[k];
+      const cv = v == null ? 0 : v;
+      const row = itemEl.querySelector(`.grade-part[data-key="${CSS.escape(k)}"]`);
+      if (row) {
+        const chip = row.querySelector(".chip");
+        chip.textContent = `${pts(cv)} / ${pts(p.points)}`;
+        chip.className = "chip " + chipClass(cv, p.points);
+      }
+    });
+    const finalInp = itemEl.querySelector("[data-final-item]");
+    if (finalInp && itemOverride(rec, q, ii) == null && document.activeElement !== finalInp) {
+      finalInp.value = isGraded(rec, q, ii) ? pts(itemFinal(rec, q, ii)) : "";
+    }
+  }
+  updateQuestionBadge(q);
+  updateSummary();
+}
+
+function updateQuestionBadge(q) {
+  const badge = document.getElementById("q-badge");
+  if (badge) badge.textContent = `${pts(questionTotal(curStudent(), q))} / ${pts(q.points)}`;
+}
+
+function updateSummary() {
+  const rec = curStudent();
+  document.getElementById("total-score").textContent = pts(grandTotal(rec));
+  const prog = document.getElementById("summary-progress");
+  if (prog) prog.textContent = `נבדקו ${gradedCount(rec)} / ${totalItems()} סעיפים`;
+  const bars = document.getElementById("q-bars");
+  bars.innerHTML = QUESTIONS.map((q) => {
+    const e = questionTotal(rec, q);
+    const pct = q.points ? (100 * e) / q.points : 0;
+    let cls = "";
+    if (e >= q.points) cls = "full";
+    else if (e < q.points * 0.4) cls = "low";
+    return `
+      <div class="q-bar-row">
+        <span>ש${esc(q.num)}</span>
+        <div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
+        <span>${pts(e)}/${pts(q.points)}</span>
+      </div>`;
+  }).join("");
+}
+
+/* —— summary visibility —— */
+function applySummaryVisibility() {
+  const wrap = document.getElementById("summary-wrap");
+  const layout = document.getElementById("grade-layout");
+  const btn = document.getElementById("btn-toggle-summary");
+  const hidden = data.ui.summaryHidden;
+  wrap.style.display = hidden ? "none" : "";
+  layout.classList.toggle("no-summary", hidden);
+  if (btn) btn.textContent = hidden ? "הצג סיכום" : "הסתר סיכום";
+}
+
+/* —— student navigation —— */
+function gotoStudent(delta) {
+  const idx = data.order.indexOf(data.ui.currentStudent);
+  let ni = idx + delta;
+  if (ni < 0) ni = 0;
+  if (ni >= data.order.length) ni = data.order.length - 1;
+  data.ui.currentStudent = data.order[ni];
+  save();
+  render();
+}
+function addStudent() {
+  const sid = makeSid(++data.seq);
+  data.students[sid] = newStudent(sid, "");
+  data.order.push(sid);
+  data.ui.currentStudent = sid;
+  save();
+  render();
+  const nm = document.getElementById("student-name");
+  if (nm) nm.focus();
+}
+
+/* —— overview / progress —— */
+function showOverview() {
+  document.getElementById("grade-view").style.display = "none";
+  document.getElementById("overview-view").style.display = "";
+  renderOverview();
+}
+function showGrade() {
+  document.getElementById("overview-view").style.display = "none";
+  document.getElementById("grade-view").style.display = "";
+  render();
+}
+
+function renderOverview() {
+  const root = document.getElementById("overview-root");
+  const nStu = data.order.length;
+
+  const head1 = QUESTIONS.map((q) =>
+    `<th colspan="${q.items.length}" class="ov-qh">שאלה ${esc(q.num)} <span class="ov-max">(${pts(q.points)})</span></th>`
+  ).join("");
+  const head2 = QUESTIONS.map((q) => q.items.map((it) =>
+    `<th class="ov-ih">${esc(it.letter)} <span class="ov-max">/${pts(it.points)}</span></th>`
+  ).join("")).join("");
+
+  const rows = data.order.map((sid, i) => {
+    const rec = data.students[sid];
+    const cells = QUESTIONS.map((q) => q.items.map((it, ii) => {
+      const graded = isGraded(rec, q, ii);
+      const f = itemFinal(rec, q, ii);
+      const ov = itemOverride(rec, q, ii) != null;
+      const cls = graded ? chipClass(f, it.points) : "ungraded";
+      return `<td class="ov-cell ${cls} ${ov ? "ov-override" : ""}" data-jump="${sid}|${q.id}" title="שאלה ${esc(q.num)} (${esc(it.letter)}) — ${esc(it.prompt)}">${graded ? pts(f) : "—"}</td>`;
+    }).join("")).join("");
+    const tot = grandTotal(rec);
+    const gc = gradedCount(rec);
+    return `<tr>
+        <td class="ov-name" data-jump-name="${sid}">${esc(rec.name || ("תלמיד/ה " + (i + 1)))}${rec.notebook ? ` <span class="ov-nb">${esc(rec.notebook)}</span>` : ""}</td>
+        ${cells}
+        <td class="ov-total">${pts(tot)}<span class="ov-max">/100</span></td>
+        <td class="ov-prog"><div class="ov-prog-bar"><div style="width:${totalItems() ? (100 * gc / totalItems()) : 0}%"></div></div><span>${gc}/${totalItems()}</span></td>
+      </tr>`;
+  }).join("");
+
+  const foot = QUESTIONS.map((q) => q.items.map((it, ii) => {
+    const c = data.order.filter((sid) => isGraded(data.students[sid], q, ii)).length;
+    const done = nStu > 0 && c === nStu;
+    return `<td class="ov-foot ${done ? "done" : ""}">${c}/${nStu}</td>`;
+  }).join("")).join("");
+
+  root.innerHTML = `
+    <div class="ov-scroll">
+      <table class="ov-table">
+        <thead>
+          <tr>
+            <th rowspan="2" class="ov-corner">תלמיד/ה</th>
+            ${head1}
+            <th rowspan="2" class="ov-total-h">ציון</th>
+            <th rowspan="2" class="ov-prog-h">התקדמות</th>
+          </tr>
+          <tr>${head2}</tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td class="ov-corner">נבדקו</td>${foot}<td></td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="meta">הציון מוצג לפי סעיפים · לחצו על תא כדי לעבור לבדיקת אותו תלמיד/ה באותה שאלה · שורת "נבדקו" מציגה כמה תלמידים כבר נבדקו בכל סעיף.</p>`;
+
+  root.querySelectorAll("[data-jump]").forEach((td) => td.addEventListener("click", () => {
+    const [sid, qId] = td.dataset.jump.split("|");
+    data.ui.currentStudent = sid;
+    data.ui.currentQ = qId;
+    save();
+    showGrade();
+  }));
+  root.querySelectorAll("[data-jump-name]").forEach((td) => td.addEventListener("click", () => {
+    data.ui.currentStudent = td.dataset.jumpName;
+    save();
+    showGrade();
+  }));
+}
+
+/* —— once-bound controls —— */
+document.getElementById("student-name").addEventListener("input", (e) => {
+  curStudent().name = e.target.value;
+  save();
+  renderStudentControls();
+});
+document.getElementById("student-id").addEventListener("input", (e) => {
+  curStudent().notebook = e.target.value;
+  save();
+  renderStudentControls();
+});
+document.getElementById("global-notes").addEventListener("input", (e) => {
+  curStudent().globalNotes = e.target.value;
+  save();
+});
+document.getElementById("student-select").addEventListener("change", (e) => {
+  data.ui.currentStudent = e.target.value;
+  save();
+  render();
+});
+document.getElementById("btn-prev-student").addEventListener("click", () => gotoStudent(-1));
+document.getElementById("btn-next-student").addEventListener("click", () => gotoStudent(1));
+document.getElementById("btn-add-student").addEventListener("click", addStudent);
+document.getElementById("btn-toggle-summary").addEventListener("click", () => {
+  data.ui.summaryHidden = !data.ui.summaryHidden;
+  save();
+  applySummaryVisibility();
+});
+document.getElementById("btn-overview").addEventListener("click", showOverview);
+document.getElementById("btn-back-grade").addEventListener("click", showGrade);
+
+document.getElementById("btn-reset").addEventListener("click", () => {
+  const rec = curStudent();
+  if (!confirm("לאפס את הניקוד, השם וההערות של התלמיד/ה הנוכחי/ת?")) return;
+  data.students[rec.id] = newStudent(rec.id, "");
+  save();
+  render();
+});
+
+document.getElementById("btn-print-rubric").addEventListener("click", () => {
+  setTab("rubric");
+  document.body.classList.add("print-rubric");
+  window.print();
+});
+
+window.addEventListener("afterprint", () => {
+  document.body.classList.remove("print-rubric", "print-summary");
+});
+
+renderRubric();
+render();
+</script>
+</body>
+</html>
