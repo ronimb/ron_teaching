@@ -15,8 +15,9 @@ Download the repository and open an HTML file in a browser to view or print it.
 - `worksheets/`: worksheets and their separate solution versions.
 - `helper-sheets/`: concept summaries and reference sheets.
 - `interactive-apps/`: interactive teaching applications and dashboards.
+- `rubrics/`: teacher rubrics explicitly approved for publication.
 
 Level folders are `3-יחל` and `4-יחל`. הקבצה ב is grouped with 3 יחל. General apps need no level folder.
 
-Only worksheets, helper sheets, and apps belong here. Exclude `calc_project`, `תבניות`, tests, quizzes, assessment tools, and reports, including future updates.
+Publish teacher rubrics only when explicitly approved for that material. Otherwise, only worksheets, helper sheets, and apps belong here. Exclude `calc_project`, `תבניות`, tests, quizzes, assessment tools, and reports, including future updates.
 
