@@ -322,6 +322,8 @@
 
     .settings-head h2 { margin: 0; font-size: 1.55rem; font-weight: 800; }
     .settings-body {
+      min-height: 0;
+      flex: 1;
       width: min(920px, 100%);
       margin: 0 auto;
       padding: 1.6rem clamp(1.25rem, 4vw, 2.5rem) 3.5rem;
@@ -343,6 +345,7 @@
     }
 
     .field textarea { min-height: 5.5rem; resize: vertical; }
+    input[data-field="url"], input[data-field="planUrl"], #mashov-url { direction: ltr; text-align: left; }
 
     .pair { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.85rem; margin-bottom: 0.9rem; }
     .pair > div { display: grid; gap: 0.45rem; }
@@ -417,6 +420,23 @@
     }
     .sync-banner .btn { flex: 0 0 auto; white-space: nowrap; }
 
+    .group-shell { min-width: 0; border-radius: 22px; background: var(--paper); box-shadow: var(--shadow); align-self: start; }
+    .group-shell > .folder { box-shadow: none; }
+    .quick-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .7rem 1rem; }
+    .quick-actions a, .quick-actions button { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .75rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); text-decoration: none; font: inherit; font-weight: 700; cursor: pointer; }
+    .quick-actions svg { width: 1.1rem; height: 1.1rem; }
+    .quick-actions .edit-group { margin-inline-start: auto; color: var(--muted); }
+    .quick-actions :focus-visible { outline: 3px solid var(--tone); outline-offset: 2px; }
+    .group-edit > summary { cursor: pointer; font-size: 1.2rem; font-weight: 800; }
+    .group-edit[open] > summary { margin-bottom: 1.2rem; }
+    .settings-head .head-actions { display: flex; gap: .6rem; }
+    button:disabled { opacity: .45; cursor: default; }
+    .icon-choice { display: flex; gap: .6rem; align-items: center; margin-bottom: .7rem; }
+    .icon-choice select { font: inherit; padding: .4rem; border: 1px solid #e0d4c4; border-radius: 8px; background: white; }
+    #save-indicator { color: var(--muted); font-size: .85rem; }
+    .board-status { display: flex; align-items: center; justify-content: space-between; margin: -1rem 0 1rem; }
+    #conflict-box { position: fixed; z-index: 30; top: 15%; right: max(1rem, calc((100vw - 640px) / 2)); width: min(640px, calc(100vw - 2rem)); padding: 1.5rem; border: 2px solid #c45c26; border-radius: 12px; background: #fff6e8; box-shadow: 0 0 0 100vmax #1c161088; }
+    #conflict-box[hidden] { display: none; }
     @media (max-width: 800px) {
       .groups, .cards, .tiles, .pair, .book-grid { grid-template-columns: 1fr; }
       .mashov-go { display: none; }
@@ -439,6 +459,8 @@
       <button class="gear" type="button" data-open-settings aria-label="הגדרות">⚙</button>
     </div>
 
+    <div class="board-status"><span id="save-indicator" role="status">נשמר בקובץ</span><button class="btn light" data-undo disabled>בטל פעולה אחרונה</button></div>
+    <div id="conflict-box" hidden role="alert"><p>הקובץ השתנה מאז שנפתח. שתי הגרסאות יישמרו לשחזור בתוך אותו קובץ. באיזו גרסה להמשיך?</p><button class="btn" data-resolve="disk">המשך עם הגרסה שבקובץ</button> <button class="btn light" data-resolve="local">המשך עם העריכה שלי</button></div>
     <div id="sync-banner" class="sync-banner" hidden>
       <p id="sync-banner-text">יש שינויים שטרם נשמרו לקובץ המשותף.</p>
       <button class="btn" type="button" data-link-file id="sync-banner-btn">שמירה לקובץ</button>
@@ -458,7 +480,7 @@
   <aside class="settings" id="settings" aria-hidden="true">
     <div class="settings-head">
       <h2>הגדרות</h2>
-      <button class="btn light" type="button" data-close-settings>סגור</button>
+      <div class="head-actions"><button class="btn light" data-undo disabled>בטל פעולה אחרונה</button><button class="btn light" type="button" data-close-settings>סגור</button></div>
     </div>
     <div class="settings-body" id="settings-body"></div>
   </aside>
@@ -501,6 +523,7 @@
       return raw.globalLinks.map((item) => ({
         id: (item && item.id) || uid("l"),
         title: (item && item.title) || "",
+        icon: (item && item.icon) || "auto",
         url: (item && item.url) || ""
       }));
     }
@@ -537,6 +560,7 @@
         return raw.extras.map((item) => ({
           id: (item && item.id) || uid("e"),
           title: (item && item.title) || "",
+          icon: (item && item.icon) || "auto",
           url: (item && item.url) || ""
         }));
       }
@@ -566,7 +590,7 @@
 
     function normalizeState(raw) {
       const base = defaultState();
-      if (!raw || !Array.isArray(raw.groups) || !raw.groups.length) {
+      if (!raw || !Array.isArray(raw.groups)) {
         return {
           updatedAt: (raw && raw.updatedAt) || 0,
           mashov: (raw && raw.mashov) || "",
@@ -575,6 +599,9 @@
         };
       }
       return {
+        schema: raw.schema || 0,
+        history: Array.isArray(raw.history) ? raw.history.slice(-20) : [],
+        base: raw.base || null,
         updatedAt: raw.updatedAt || 0,
         mashov: raw.mashov || "",
         globalLinks: normalizeGlobalLinks(raw),
@@ -772,8 +799,7 @@
     let knownDisk = readEmbedded();
     let fileWriteInFlight = false;
 
-    function supportsFileApi() {
-      return Boolean(window.showOpenFilePicker || window.showSaveFilePicker);
+    function supportsFileApi() { return Boolean(window.showOpenFilePicker);
     }
 
     function cloneState(snapshot) {
@@ -781,20 +807,13 @@
     }
 
     function isFileSynced() {
-      if (!isPopulated(state)) return true;
-      if (!knownDisk) return false;
-      if ((state.updatedAt || 0) > (knownDisk.updatedAt || 0)) return false;
-      return richness(knownDisk) >= richness(state);
+      return Boolean(knownDisk) && contentKey(state) === contentKey(knownDisk);
     }
 
-    function needsFileSave() {
-      return isPopulated(state) && !isFileSynced();
+    function needsFileSave() { return !isFileSynced();
     }
 
-    function saveActionLabel() {
-      if (fileHandle) return "שמירה לקובץ";
-      if (supportsFileApi()) return "בחירת קובץ";
-      return "הורדת קובץ מעודכן";
+    function saveActionLabel() { return fileHandle ? "נסה לשמור שוב" : "אפשר שמירה לקובץ הקיים";
     }
 
     function suggestedFileName() {
@@ -858,23 +877,12 @@
     }
 
     async function pickDashboardFile() {
-      if (window.showOpenFilePicker) {
-        const [handle] = await window.showOpenFilePicker({
-          multiple: false,
-          types: [{ description: "HTML", accept: { "text/html": [".html"] } }]
-        });
-        if (!(await ensureWritePermission(handle))) throw new Error("permission");
-        const text = await (await handle.getFile()).text();
-        if (!/id="embedded-settings"/.test(text)) throw new Error("wrong-file");
-        return handle;
-      }
-      if (window.showSaveFilePicker) {
-        return window.showSaveFilePicker({
-          suggestedName: suggestedFileName(),
-          types: [{ description: "HTML", accept: { "text/html": [".html"] } }]
-        });
-      }
-      throw new Error("unsupported");
+      if (!supportsFileApi()) throw new Error("unsupported");
+      const [handle] = await window.showOpenFilePicker({ multiple: false, types: [{ description: "לוח הבקרה הקיים", accept: { "text/html": [".html"] } }] });
+      const text = await (await handle.getFile()).text();
+      if (!parseEmbeddedFromText(text) || handle.name !== suggestedFileName()) throw new Error("wrong-file");
+      if (!(await ensureWritePermission(handle))) throw new Error("permission");
+      return handle;
     }
 
     function applySnapshot(snapshot) {
@@ -885,79 +893,50 @@
       if (settingsEl.classList.contains("on")) renderSettings();
     }
 
-    function snapshotForDisk(onDisk) {
-      if (isPopulated(onDisk) && !isPopulated(state)) return null;
-      if (!isPopulated(state)) return null;
-      if (isPopulated(onDisk) && richness(state) < richness(onDisk)) {
-        const merged = mergePreferFilled(state, onDisk);
-        merged.updatedAt = Math.max(state.updatedAt || 0, onDisk.updatedAt || 0, Date.now());
-        return merged;
-      }
-      return state;
+    function snapshotForDisk() { return cloneState(state);
     }
 
     async function writeToLinkedFile() {
-      if (!fileHandle) return false;
-      if (!(await ensureWritePermission(fileHandle))) return false;
-      const text = await (await fileHandle.getFile()).text();
-      const onDisk = parseEmbeddedFromText(text);
-      if (isPopulated(onDisk) && !isPopulated(state)) {
-        knownDisk = onDisk;
-        applySnapshot(onDisk);
-        return "adopted";
-      }
-      const snapshot = snapshotForDisk(onDisk);
-      if (!snapshot) return false;
-      if (snapshot !== state) applySnapshot(snapshot);
-      const html = htmlWithSettingsFromText(text, snapshot);
-      const writable = await fileHandle.createWritable();
-      await writable.write(html);
-      await writable.close();
-      knownDisk = snapshot;
-      writeEmbeddedTag();
-      return true;
+      if (writePromise) { await writePromise; return needsFileSave() ? writeToLinkedFile() : true; }
+      writePromise = (async () => {
+        if (!fileHandle || conflict) return false;
+        if (!(await ensureWritePermission(fileHandle))) throw new Error("permission");
+        const text = await (await fileHandle.getFile()).text();
+        const onDisk = parseEmbeddedFromText(text);
+        if (!onDisk) throw new Error("wrong-file");
+        if (contentKey(onDisk) !== contentKey(knownDisk) && contentKey(onDisk) !== contentKey(state)) {
+          conflict = onDisk;
+          showConflict();
+          return false;
+        }
+        const snapshot = cloneState(state);
+        const html = htmlWithSettingsFromText(text, snapshot);
+        const writable = await fileHandle.createWritable();
+        try { await writable.write(html); await writable.close(); }
+        catch (err) { try { await writable.abort(); } catch {} throw err; }
+        knownDisk = snapshot;
+        state.base = core(snapshot);
+        writeLocal();
+        writeEmbeddedTag();
+        return true;
+      })();
+      try { return await writePromise; } finally { writePromise = null; }
     }
 
-    async function htmlFromCurrentFile() {
-      const res = await fetch(location.href);
-      if (!res.ok) throw new Error("fetch");
-      const text = await res.text();
-      const snapshot = snapshotForDisk(parseEmbeddedFromText(text));
-      if (!snapshot) throw new Error("protect");
-      return htmlWithSettingsFromText(text, snapshot);
-    }
 
-    function downloadHtml(html) {
-      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = suggestedFileName();
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    }
+
+
 
     function scheduleFileWrite() {
-      if (!fileHandle) return;
-      if (!isPopulated(state) && isPopulated(knownDisk)) return;
       clearTimeout(fileWriteTimer);
-      fileWriteTimer = setTimeout(() => {
-        fileWriteInFlight = true;
-        writeToLinkedFile()
-          .then((ok) => {
-            if (ok === true) setStatus("נשמר לקובץ");
-            else if (ok === "adopted") setStatus("נטען מהקובץ");
-            else setStatus("השמירה לקובץ נחסמה כדי לא לדרוס הגדרות", true);
-            updateSyncBanner();
-            if (settingsEl.classList.contains("on")) renderSettings();
-          })
-          .catch(() => {
-            setStatus("השמירה לקובץ נכשלה — לחצו לשמירה שוב", true);
-            updateSyncBanner();
-            if (settingsEl.classList.contains("on")) renderSettings();
-          })
-          .finally(() => {
-            fileWriteInFlight = false;
-          });
+      if (!fileHandle || conflict) return;
+      fileWriteTimer = setTimeout(async () => {
+        try {
+          const ok = await writeToLinkedFile();
+          if (ok) setStatus(needsFileSave() ? "שומר…" : "נשמר בקובץ");
+          if (ok && needsFileSave()) scheduleFileWrite();
+        } catch { setStatus("טרם נשמר בקובץ — נסו שוב", true); }
+        updateSyncBanner();
       }, 800);
     }
 
@@ -973,61 +952,24 @@
       }
     }
 
-    async function downloadUpdatedFile() {
-      downloadHtml(await htmlFromCurrentFile());
-      knownDisk = cloneState(state);
-      writeEmbeddedTag();
-      setStatus("הקובץ ירד. החליפו איתו את הקובץ בתיקייה המשותפת של OneDrive");
-      updateSyncBanner();
-      if (settingsEl.classList.contains("on")) renderSettings();
-    }
+
 
     async function linkAndWriteFile() {
-      if (!isPopulated(state) && isPopulated(knownDisk)) {
-        setStatus("לא נשמר לקובץ כדי לא לדרוס הגדרות קיימות", true);
-        return false;
-      }
-      if (!isPopulated(state) && !isPopulated(knownDisk)) {
-        setStatus("אין עדיין קישורים לשמירה לקובץ", true);
-        return false;
-      }
       try {
-        if (supportsFileApi()) {
-          if (!fileHandle || !(await ensureWritePermission(fileHandle))) {
-            fileHandle = await pickDashboardFile();
-            await storeFileHandle(fileHandle);
-          }
-          const ok = await writeToLinkedFile();
-          if (!ok) {
-            setStatus("לא נשמר לקובץ כדי לא לדרוס הגדרות קיימות", true);
-            updateSyncBanner();
-            if (settingsEl.classList.contains("on")) renderSettings();
-            return false;
-          }
-          setStatus(ok === "adopted" ? "נטען מהקובץ" : "נשמר לקובץ");
-          updateSyncBanner();
-          if (settingsEl.classList.contains("on")) renderSettings();
-          return true;
+        if (!supportsFileApi()) { setStatus("לשמירה באותו קובץ יש לפתוח בדפדפן כרום או אדג׳ במחשב", true); return false; }
+        if (!fileHandle) {
+          fileHandle = await pickDashboardFile();
+          try { await storeFileHandle(fileHandle); } catch {}
         }
-        await downloadUpdatedFile();
-        return true;
+        const ok = await writeToLinkedFile();
+        if (ok) setStatus(needsFileSave() ? "שומר…" : "נשמר בקובץ");
+        updateSyncBanner();
+        return ok;
       } catch (err) {
-        if (err && err.name === "AbortError") {
-          setStatus("יש לבחור את הקובץ כדי לשמור בין מכשירים", true);
-          return false;
-        }
-        if (err && err.message === "wrong-file") {
-          setStatus("בחרו את קובץ לוח הבקרה, לא קובץ אחר", true);
-          fileHandle = null;
-          return false;
-        }
-        try {
-          await downloadUpdatedFile();
-          return true;
-        } catch {
-          setStatus("לא ניתן לשמור לקובץ", true);
-          return false;
-        }
+        setStatus(err.name === "AbortError" ? "טרם נשמר — יש לבחור את לוח הבקרה הקיים" : err.message === "wrong-file" ? "יש לבחור את קובץ לוח הבקרה הקיים שממנו נפתח העמוד" : "לא ניתן לשמור כרגע — השינויים מוגנים בדפדפן", true);
+        if (err.message === "wrong-file") fileHandle = null;
+        updateSyncBanner();
+        return false;
       }
     }
 
@@ -1037,6 +979,7 @@
     function setStatus(text, err) {
       saveStatus = text;
       saveErr = Boolean(err);
+      document.getElementById("save-indicator").textContent = text;
       const el = document.getElementById("save-status");
       if (el) {
         el.textContent = saveStatus;
@@ -1045,18 +988,18 @@
     }
 
     function persist() {
+      state.schema = 2;
       state.updatedAt = Date.now();
       writeEmbeddedTag();
-      if (!writeLocal()) {
-        setStatus("השמירה נכשלה", true);
-        updateSyncBanner();
-        return;
+      const cached = writeLocal();
+      if (!cached) {
+        setStatus("הדפדפן לא הצליח לשמור עותק התאוששות — יש לשמור לקובץ", true);
       }
       if (fileHandle) {
         setStatus("שומר לקובץ…");
         scheduleFileWrite();
       } else {
-        setStatus("חובה לשמור לקובץ — אחרת השינוי יישאר רק במכשיר הזה", true);
+        setStatus(cached ? "השינוי מוגן בדפדפן — אפשרו שמירה לקובץ הקיים" : "יש לאפשר שמירה לקובץ — עותק ההתאוששות בדפדפן אינו זמין", true);
       }
       updateSyncBanner();
       if (settingsEl.classList.contains("on")) {
@@ -1068,11 +1011,13 @@
     function loadAll() {
       const embedded = readEmbedded();
       const local = readLocal();
-      if (isPopulated(embedded) && isPopulated(local)) {
-        if ((local.updatedAt || 0) > (embedded.updatedAt || 0)) {
-          return mergePreferFilled(local, embedded);
-        }
-        return mergePreferFilled(embedded, local);
+      if (!local) return embedded || defaultState();
+      if (local.schema >= 2 || (embedded && embedded.schema >= 2)) {
+        if (contentKey(local) === contentKey(embedded)) return embedded;
+        if (local.base && contentKey(local.base) === contentKey(local)) return embedded;
+        if (local.base && contentKey(local.base) === contentKey(embedded)) return local;
+        conflict = embedded;
+        return local;
       }
       return pickState(local, embedded);
     }
@@ -1090,7 +1035,7 @@
           ? "יש שינויים שממתינים לשמירה לקובץ המשותף."
           : supportsFileApi()
             ? "חובה לשמור לקובץ המשותף. בחרו את קובץ לוח הבקרה בתיקיית OneDrive."
-            : "חובה להוריד קובץ מעודכן ולהחליף איתו את הקובץ בתיקיית OneDrive.";
+            : "לשמירה באותו קובץ יש לפתוח בכרום או באדג׳ במחשב.";
       }
       if (btn) btn.textContent = saveActionLabel();
     }
@@ -1109,7 +1054,7 @@
 
     function href(url) {
       const value = String(url || "").trim();
-      return value || "#";
+      return /^https?:\/\//i.test(value) ? escapeAttr(value) : "#";
     }
 
     function tile(label, hint, url, icon, extraClass) {
@@ -1188,8 +1133,10 @@
         </details>`;
     }
 
+    let rendered = false;
     function renderBoard() {
-      const open = snapshotOpen();
+      const open = rendered ? snapshotOpen() : readView();
+      rendered = true;
       const mashov = (state.mashov || "").trim();
       mashovEl.href = href(mashov);
       mashovEl.classList.toggle("is-empty", !mashov);
@@ -1197,7 +1144,7 @@
       groupsEl.innerHTML = state.groups.map((g, i) => {
         const tone = TONES[i % TONES.length];
         return `
-          <details class="folder" data-id="${g.id}" ${open.groups.includes(g.id) ? "open" : ""} style="--tone:${tone}">
+          <article class="group-shell" style="--tone:${tone}"><details class="folder" data-id="${g.id}" ${open.groups.includes(g.id) ? "open" : ""} style="--tone:${tone}">
             <summary class="folder-summary">
               <span class="folder-tab"></span>
               <span class="grade">${escapeHtml(g.year || "—")}</span>
@@ -1209,12 +1156,16 @@
             <div class="folder-body">
               <div class="tiles">
                 ${tile(g.planTitle || "פריסה שנתית", "תכנית הלימוד", g.planUrl, ICONS.plan)}
-                ${(g.extras || []).map((item) => tile(item.title || "קישור", "קישור", item.url, ICONS.extra)).join("")}
+                ${(g.extras || []).map((item) => tile(item.title || "קישור", "קישור", item.url, resourceIcon(item))).join("")}
                 ${booksTile(g)}
               </div>
               ${booksPanel(g, open.groupBooks.includes(g.id))}
             </div>
-          </details>`;
+          </details><div class="quick-actions">
+            ${filled(g.planUrl) ? `<a href="${href(g.planUrl)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24">${ICONS.plan}</svg>${escapeHtml(g.planTitle || "פריסה")}</a>` : ""}
+            ${(g.extras || []).filter(isClassroom).filter(x => filled(x.url)).map(x => `<a href="${href(x.url)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24">${resourceIcon(x)}</svg>${escapeHtml(x.title || "קלאסרום")}</a>`).join("")}
+            <button class="edit-group" data-edit-group="${g.id}" aria-label="עריכת ${escapeAttr(groupLabel(g))}">עריכה ⚙</button>
+          </div></article>`;
       }).join("") || `<p class="empty">אין קבוצות. פתחו את ההגדרות כדי להוסיף.</p>`;
 
       if (open.groupBooks.length) {
@@ -1269,16 +1220,19 @@
         body: globalLinks.length
           ? globalLinks.map((link) => `
               <a class="card" style="--tone:#3d4f8a" href="${href(link.url)}" target="_blank" rel="noopener">
-                <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${ICONS.extra}</svg></span>
+                <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${resourceIcon(link)}</svg></span>
                 <strong>${escapeHtml(link.title || "קישור")}</strong>
               </a>`).join("")
           : `<p class="empty">כאן יופיעו קישורים כלליים שאינם שייכים לקבוצה.</p>`
       });
       updateSyncBanner();
+      updateExpandButton();
+      updateUndo();
     }
 
     function renderSettings() {
       const synced = isFileSynced();
+      const expanded = [...settingsBody.querySelectorAll("details.group-edit[open]")].map(x => x.dataset.id);
       settingsBody.innerHTML = `
         <p id="save-status" class="save-status${saveErr || !synced ? " err" : ""}">${synced
           ? (saveErr ? saveStatus : "ההגדרות מסונכרנות לקובץ המשותף")
@@ -1287,7 +1241,7 @@
           ? "הקובץ ב־OneDrive הוא מקור האמת. בסגירת ההגדרות השינויים נשמרים לקובץ אוטומטית."
           : supportsFileApi()
             ? "בסגירה השינויים יישמרו לקובץ. בפעם הראשונה בחרו את לוח הבקרה בתיקיית OneDrive — אחר כך זה אוטומטי."
-            : "בסגירה יורד קובץ מעודכן. החליפו איתו את הקובץ ב־OneDrive."}</p>
+            : "השמירה מתבצעת רק לקובץ הקיים, בכרום או באדג׳ במחשב."}</p>
         ${synced ? "" : `<div class="file-save-row">
           <button class="btn" type="button" data-link-file id="settings-save-file">${saveActionLabel()}</button>
         </div>`}
@@ -1312,6 +1266,7 @@
                 <input data-global-link="${li}" data-field="url" value="${escapeAttr(link.url)}" placeholder="https://..." />
               </div>
             </div>
+            ${iconSelect(link, `data-global-link="${li}"`)}
             <div class="row-actions">
               <span></span>
               <button class="btn ghost" type="button" data-remove-global-link="${li}">הסר קישור</button>
@@ -1323,8 +1278,8 @@
           <button class="btn light" type="button" data-add-group>הוספת קבוצה</button>
         </div>
         ${state.groups.map((g, i) => `
-          <article class="group-edit" data-id="${g.id}">
-            <h3>קבוצה ${i + 1}</h3>
+          <details class="group-edit" data-id="${g.id}" ${expanded.includes(g.id) ? "open" : ""}>
+            <summary>${escapeHtml(groupLabel(g))}</summary>
             <div class="pair">
               <div>
                 <label>שנתון</label>
@@ -1358,6 +1313,7 @@
                     <input data-g="${g.id}" data-extra="${ei}" data-field="url" value="${escapeAttr(item.url)}" placeholder="https://..." />
                   </div>
                 </div>
+                ${iconSelect(item, `data-g="${g.id}" data-extra="${ei}"`)}
                 <div class="row-actions">
                   <span></span>
                   <button class="btn ghost" type="button" data-remove-extra="${g.id}" data-extra-index="${ei}">הסר קישור</button>
@@ -1399,7 +1355,7 @@
               <span></span>
               <button class="btn ghost" type="button" data-remove="${g.id}">מחק קבוצה</button>
             </div>
-          </article>
+          </details>
         `).join("")}
       `;
     }
@@ -1413,8 +1369,12 @@
       renderBoard();
     }
 
+    let inputTarget = null;
+    settingsBody.addEventListener("focusin", (e) => { if (e.target.matches("input,textarea,select")) inputTarget = null; });
     settingsBody.addEventListener("input", (e) => {
       const t = e.target;
+      if (!t.dataset.field) return;
+      if (inputTarget !== t) { remember(); inputTarget = t; }
       if (t.dataset.field === "mashov") {
         state.mashov = t.value;
         persistAndPaint();
@@ -1448,6 +1408,7 @@
       const removeExtra = e.target.closest("[data-remove-extra]");
       const addGlobal = e.target.closest("[data-add-global-link]");
       const removeGlobal = e.target.closest("[data-remove-global-link]");
+      if (add || remove || addBook || removeBook || addExtra || removeExtra || addGlobal || removeGlobal) remember();
       if (add) {
         state.groups.push(group("", ""));
         persistAndPaint();
@@ -1503,11 +1464,17 @@
       }
     });
 
-    function openSettings() {
+    function openSettings(id) {
       renderSettings();
       settingsEl.classList.add("on");
+      document.body.style.overflow = "hidden";
       scrimEl.classList.add("on");
       settingsEl.setAttribute("aria-hidden", "false");
+      settingsEl.inert = false;
+      updateUndo();
+      const editor = [...settingsBody.querySelectorAll(".group-edit")].find(x => x.dataset.id === id);
+      if (editor) { editor.open = true; editor.scrollIntoView({ block: "start" }); editor.querySelector("summary").focus(); }
+      else settingsEl.querySelector("[data-close-settings]").focus();
     }
 
     async function flushFileSave() {
@@ -1544,8 +1511,11 @@
         }
       }
       settingsEl.classList.remove("on");
+      document.body.style.overflow = "";
       scrimEl.classList.remove("on");
       settingsEl.setAttribute("aria-hidden", "true");
+      settingsEl.inert = true;
+      document.querySelector("[data-open-settings]").focus();
     }
 
     function groupFolders() {
@@ -1559,6 +1529,11 @@
     }
 
     document.addEventListener("click", (e) => {
+      const edit = e.target.closest("[data-edit-group]");
+      if (edit) openSettings(edit.dataset.editGroup);
+      if (e.target.closest("[data-undo]")) undo();
+      const resolution = e.target.closest("[data-resolve]");
+      if (resolution) resolveConflict(resolution.dataset.resolve);
       if (e.target.closest("[data-expand-groups]")) expandAllGroups();
       if (e.target.closest("[data-open-settings]")) openSettings();
       if (e.target.closest("[data-close-settings]")) closeSettings();
@@ -1566,7 +1541,7 @@
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeSettings();
+      if (e.key === "Escape" && settingsEl.classList.contains("on")) closeSettings();
     });
 
     groupsEl.addEventListener("toggle", (e) => {
@@ -1587,13 +1562,82 @@
       return escapeHtml(s).replaceAll('"', "&quot;");
     }
 
+    let writePromise = null;
+    let conflict = null;
+    function core(snapshot) {
+      if (!snapshot) return null;
+      return { mashov: snapshot.mashov || "", globalLinks: snapshot.globalLinks || [], groups: snapshot.groups || [] };
+    }
+    function contentKey(snapshot) { return JSON.stringify(core(snapshot)); }
+    function remember() {
+      state.history = [...(state.history || []), { ...core(cloneState(state)), updatedAt: state.updatedAt }].slice(-20);
+      updateUndo();
+    }
+    function updateUndo() { document.querySelectorAll("[data-undo]").forEach(b => b.disabled = !(state.history || []).length); }
+    function undo() {
+      if (!(state.history || []).length) return;
+      const history = state.history.slice();
+      const previous = history.pop();
+      state = { ...state, ...previous, history };
+      inputTarget = null;
+      persistAndPaint(); renderSettings(); updateUndo();
+    }
+    function showConflict() {
+      document.getElementById("conflict-box").hidden = !conflict;
+      setStatus("הקובץ השתנה — יש לבחור באיזו גרסה להמשיך", true);
+    }
+    function resolveConflict(choice) {
+      if (!conflict) return;
+      const disk = conflict;
+      remember();
+      if (choice === "disk") state = { ...state, ...core(disk) };
+      else state.history = [...state.history, { ...core(disk), updatedAt: disk.updatedAt }].slice(-20);
+      knownDisk = cloneState(disk);
+      conflict = null;
+      document.getElementById("conflict-box").hidden = true;
+      persistAndPaint(); renderSettings();
+    }
+    function isClassroom(item) { return /classroom\.google\.com/i.test(item.url || "") || /קלאסרום|classroom/i.test(item.title || ""); }
+    function resourceIcon(item) {
+      const key = item.icon && item.icon !== "auto" ? item.icon : isClassroom(item) ? "classroom" : /נוסחאות/.test(item.title || "") ? "formulas" : /פריסה|תכנית/.test(item.title || "") ? "plan" : "extra";
+      return ICONS[key] || ICONS.extra;
+    }
+    function iconSelect(item, attrs) {
+      const options = { auto: "זיהוי אוטומטי", extra: "קישור כללי", classroom: "כיתה", formulas: "נוסחאות", plan: "מסמך", book: "ספר" };
+      return `<label class="icon-choice">אייקון <select ${attrs} data-field="icon">${Object.entries(options).map(([k,v]) => `<option value="${k}" ${(item.icon || "auto") === k ? "selected" : ""}>${v}</option>`).join("")}</select></label>`;
+    }
+    const VIEW_KEY = "brenner-dashboard-view:" + location.pathname;
+    function readView() {
+      try { const view = JSON.parse(localStorage.getItem(VIEW_KEY)); if (view && Array.isArray(view.groups) && Array.isArray(view.groupBooks)) return view; } catch {}
+      return { groups: [], groupBooks: [], plans: false, books: false, links: false };
+    }
+    function updateExpandButton() {
+      const all = groupFolders().length > 0 && groupFolders().every(x => x.open);
+      const button = document.querySelector("[data-expand-groups]");
+      button.title = all ? "סגור את כל הקבוצות" : "פתח את כל הקבוצות";
+      button.setAttribute("aria-label", button.title);
+      button.setAttribute("aria-expanded", String(all));
+    }
+    document.addEventListener("toggle", e => {
+      if (!e.target.closest("main")) return;
+      try { localStorage.setItem(VIEW_KEY, JSON.stringify(snapshotOpen())); } catch {}
+      updateExpandButton();
+    }, true);
+    window.addEventListener("beforeunload", e => { if (needsFileSave()) { e.preventDefault(); e.returnValue = ""; } });
+    settingsEl.inert = true;
     state = loadAll();
+    if (!state.base) state.base = core(knownDisk);
+    if (conflict) showConflict();
     writeLocal();
     if (isFileSynced()) knownDisk = cloneState(state);
     renderBoard();
     updateSyncBanner();
+    if (needsFileSave() && !conflict) setStatus("יש שינויים מוגנים בדפדפן שטרם נשמרו לקובץ", true);
     restoreFileHandle().then(async () => {
-      if (fileHandle && needsFileSave()) await writeToLinkedFile();
+      if (fileHandle && needsFileSave() && !conflict) {
+        try { await writeToLinkedFile(); setStatus(needsFileSave() ? "טרם נשמר בקובץ" : "נשמר בקובץ", needsFileSave()); }
+        catch { setStatus("טרם נשמר בקובץ — נסו שוב", true); }
+      }
       updateSyncBanner();
       if (settingsEl.classList.contains("on")) renderSettings();
     });
