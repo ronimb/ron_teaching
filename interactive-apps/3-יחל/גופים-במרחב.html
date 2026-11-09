@@ -4,11 +4,22 @@ main{grid-template-columns:minmax(0,1fr);gap:12px;padding-top:12px}aside{padding
 .fill-panel{min-width:0;background:#eef4f7;border-radius:10px}.fill-panel .stat{border-radius:10px 10px 0 0}#fill-control{padding:0 10px 10px}#fill-control label{margin:0;font-size:13px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px}#fill-control input{width:100%;min-height:44px;margin:0;order:2}#fill-control output{font-size:15px}#fill-control input:focus-visible{outline:3px solid #ed9f21}
 .shave-top{margin:0 56px 8px 0;font-size:14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:3px}.shave-top input{direction:rtl;min-height:44px;width:100%;margin:0}.shave-stage{display:grid;grid-template-columns:52px minmax(0,1fr);gap:4px}.shave-side{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;text-align:center}.shave-side input{writing-mode:vertical-lr;direction:ltr;width:44px;height:100%;min-height:180px;flex:1;padding:0}.shave-help{display:block;font-size:12px;line-height:1.5}#shave-reset{min-height:44px;font-size:13px}.primary{min-width:0}
 .lateral-panel{min-width:0;background:#eef4f7;border-radius:10px}.lateral-panel .stat{border-radius:10px 10px 0 0}.net-launch{display:block;width:calc(100% - 12px);min-height:36px;margin:0 6px 6px;font-size:13px}.net-launch[hidden]{display:none}
-.object-pane{min-width:0}.net-inline{display:flex;flex-direction:column;margin-top:8px;padding:12px;color:#172b42;background:#f6f9fc;border:1px solid #c4d5e0;border-radius:14px;scroll-margin-top:12px}.net-inline[hidden]{display:none}.net-inline h2{font-size:14px;margin:0}.net-header button{margin:0;padding:4px 8px}.net-header,.net-controls{display:flex;align-items:center;justify-content:space-between;gap:6px}.net-inline button{min-height:44px;font-size:13px;flex-shrink:0}.net-inline svg{display:block;width:100%;height:auto;aspect-ratio:620/380;min-height:125px;max-height:390px}.net-controls label{flex:1;min-width:0;margin:2px 0;font-size:13px}.net-controls input{min-height:44px;margin:0}.net-inline p{margin:4px 0;font-size:13px}
+.object-pane{min-width:0;scroll-margin-top:6px}
+.object-pane:has(.net-inline:not([hidden])) #main{display:block;height:clamp(136px,41svh,340px)}
+.net-inline{position:relative;display:flex;flex-direction:column;margin-top:4px;padding:4px 8px;color:#172b42;background:#f6f9fc;border:1px solid #c4d5e0;border-radius:14px}
+.net-inline[hidden]{display:none}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#net-close{position:absolute;inset-block-start:2px;inset-inline-start:2px;display:grid;place-items:center;width:44px;height:44px;margin:0;padding:0;border:0;background:transparent;color:#172b42}
+#net-close:hover{background:#e3edf4}#net-close svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+#net-picture{display:block;width:100%;height:clamp(118px,36svh,280px)}
+.net-controls{display:flex;align-items:center;gap:8px}.net-controls button{min-height:44px;font-size:13px;flex-shrink:0}.net-controls label{flex:1;min-width:0;margin:0;font-size:13px}.net-controls input{min-height:38px;margin:0}.net-inline p{margin:0 0 3px;font-size:12px}
+
 .measurement-column{min-width:0}#calculation{padding:10px;margin-bottom:8px;border:1px solid #c4d5e0;border-radius:10px;background:#f7fbff}#calculation h2{margin:0 0 6px;font-size:14px}#calculation p{margin:5px 0;font-size:13px;line-height:1.45;overflow-wrap:anywhere}#calculation p[dir=ltr]{text-align:left;font-variant-numeric:tabular-nums}#calculation .calc-result{color:#172b42;font-weight:bold}#calculation .calc-base{color:#56369a}#calculation .calc-height{color:#a04600}#calculation .calc-side{color:#83530e}
 </style>
 <header><h1>מעבדת גופים במרחב</h1>י״ב · 3 יח״ל · מסובבים, מודדים וממלאים</header><main><aside><details id="settings" open><summary>הגדרות הגוף והמילוי</summary><div class="settings-strip"><label>בחרו גוף <select id="shape"></select></label><div id="dims"></div><hr><label>כמות בסמ״ק <input id="amount" type="number" min="0" step="0.1"></label><p id="level"></p><button id="reset">איפוס מבט</button><label>סיבוב אופקי <input id="yaw" type="range" min="-180" max="180" value="-30"></label><label>הטיה <input id="pitch" type="range" min="-90" max="90" value="20"></label><small>גררו את הגוף לסיבוב. המבטים משמאל קבועים ביחס לגוף ואינם משתנים בזמן הסיבוב.<br>המילוי הוא מודל מתמטי של כלי קיבול; סיבוב המבט אינו מטה את הכלי.</small></div></details></aside><article><div class="scene"><div class="measurement-column"><section id="calculation" aria-labelledby="calculation-title" hidden><h2 id="calculation-title"></h2><div id="calculation-lines"></div></section><div id="stats" aria-label="מידע והדגשה"></div></div><div class="primary"><label class="shave-top">גילוח מימין לשמאל <output id="shave-x-value">0%</output><input id="shave-x" aria-label="גילוח מימין לשמאל" type="range" min="0" max="100" step="0.1" value="0"></label><div class="shave-stage"><label class="shave-side">מלמעלה למטה <output id="shave-y-value">0%</output><input id="shave-y" aria-label="גילוח מלמעלה למטה" type="range" min="0" max="100" step="0.1" value="0"></label><div class="object-pane"><canvas id="main" aria-label="גוף תלת ממדי הניתן לסיבוב"></canvas><section id="net-dialog" class="net-inline" aria-labelledby="net-title" hidden>
-  <div class="net-header"><h2 id="net-title">פריסת מעטפת</h2><button id="net-close" type="button">חזרה לגוף</button></div>
+  <h2 id="net-title" class="sr-only">פריסת מעטפת</h2>
+  <button id="net-close" type="button" aria-label="סגירת פריסת המעטפת" title="סגירת פריסת המעטפת">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+  </button>
   <svg id="net-picture" viewBox="0 0 620 380" role="img" aria-labelledby="net-title net-description"></svg>
   <div class="net-controls"><button id="net-replay" type="button">נגן שוב</button><label>שלב הפריסה <output id="net-percent"></output><input id="net-progress" type="range" min="0" max="100" step="1" value="0"></label></div>
   <p id="net-description"></p>
@@ -78,7 +89,7 @@ function showCalculation(shape){
   }
   $('calculation-lines').innerHTML=content;
 }
-function render(){$('shave-x-value').textContent=fmt(+$('shave-x').value)+'%';$('shave-y-value').textContent=fmt(+$('shave-y').value)+'%';let f=+$('fill').value/100,z=fractionHeight(f),s=+$('shape').value;$('pct').textContent=fmt(f*100)+'%';$('amount').value=(V*f).toFixed(2);$('level').textContent='גובה המילוי: '+fmt(z)+' ס״מ ('+fmt(z/H*100)+'% מהגובה)';let formulas=sphere?['P = 4πR²','—','4πR³/3']:[['M + 2·a·b','6a²','M + 2S'][s]??(s===7?'M + 2πR²':s===8?'M + πR²':'M + S'),['2(a·h + b·h)','4a²','h·P'][s]??(s===7?'2πR·h':s===8?'πRℓ':'סכום שטחי הפאות הצדדיות'),['a·b·h','a³'][s]??(s===7?'πR²·h':s===8?'πR²·h/3':'S·h'+(pyramid?'/3':''))];let fillControl=$('fill-control');let cardsHTML=[['שטח פנים',F,'סמ״ר',formulas[0]],['שטח מעטפת',M,'סמ״ר',formulas[1]],['נפח מלא',V,'סמ״ק',formulas[2]],['גובה',H,'ס״מ',sphere?'2R':s===1?'a':'h'],['כמות המילוי',V*f,'סמ״ק','V × '+fmt(f)],[[7,8].includes(s)?'היקף הבסיס':'אורך מקצוע',[7,8].includes(s)?2*Math.PI*r:s>=7?NaN:a,'ס״מ',[7,8].includes(s)?'2πR':s>=7?'אין מקצועות מצולעיים':'a (מקצוע בסיס)']].map(([t,v,u,e],i)=>{let mode=['surface','lateral','volume','height','volume',[7,8].includes(s)?'perimeter':'edge'][i];let legends={surface:'<i class="key base-key"></i>בסיסים · <i class="key side-key"></i>מעטפת',lateral:'<i class="key side-key"></i>פאות צדדיות',volume:'<i class="key fill-key"></i>חומר המילוי',height:'<i class="key height-key"></i>גובה מאונך לבסיס',perimeter:'<i class="key edge-key"></i>היקף בסיס מעגלי',edge:'<i class="key edge-key"></i>מקצועות ואורכיהם'};return `<button type="button" class="stat" data-mode="${mode}" aria-pressed="${selectedMode===mode}" ${isNaN(v)?'disabled':''}>${t}<b>${isNaN(v)?'לא מוגדר':fmt(v)+' '+u}</b><span dir="ltr">${e}</span><span class="legend">${sphere&&mode==='surface'?'<i class="key side-key"></i>פני הכדור':legends[mode]}</span></button>`}).join('');if(!$('stats').children.length){$('stats').innerHTML=cardsHTML;let lateralCard=$('stats').children[1];let lateralPanel=document.createElement('div');lateralPanel.className='lateral-panel';lateralCard.replaceWith(lateralPanel);lateralPanel.appendChild(lateralCard);let netButton=document.createElement('button');netButton.type='button';netButton.id='net-launch';netButton.className='net-launch';netButton.textContent='פריסת מעטפת';netButton.setAttribute('aria-controls','net-dialog');netButton.setAttribute('aria-expanded','false');netButton.onclick=openNet;lateralPanel.appendChild(netButton);let fillCard=$('stats').children[4];let fillPanel=document.createElement('div');fillPanel.className='fill-panel';fillCard.replaceWith(fillPanel);fillPanel.appendChild(fillCard);fillControl.hidden=false;fillPanel.appendChild(fillControl)}else{let template=document.createElement('div');template.innerHTML=cardsHTML;let buttons=$('stats').querySelectorAll('button[data-mode]');Array.from(template.children).forEach((fresh,i)=>{let current=buttons[i];current.innerHTML=fresh.innerHTML;current.dataset.mode=fresh.dataset.mode;current.disabled=fresh.disabled;current.setAttribute('aria-pressed',fresh.getAttribute('aria-pressed'))})}$('net-launch').hidden=sphere;showCalculation(s);$('note').textContent=pyramid?'בפירמידה ובחרוט, חצי נפח אינו חצי גובה. החתכים נעשים קטנים ככל שמתקרבים לקודקוד.':sphere?'גובה המילוי מחושב לפי נפח כיפה כדורית.':'בגוף בעל חתך קבוע, אחוז הנפח שווה לאחוז הגובה.';draw('main',+$('yaw').value*Math.PI/180,+$('pitch').value*Math.PI/180,z);draw('front',0,0,z);draw('top',0,Math.PI/2,z);draw('right',Math.PI/2,0,z)}
+function render(){$('shave-x-value').textContent=fmt(+$('shave-x').value)+'%';$('shave-y-value').textContent=fmt(+$('shave-y').value)+'%';let f=+$('fill').value/100,z=fractionHeight(f),s=+$('shape').value;$('pct').textContent=fmt(f*100)+'%';$('amount').value=(V*f).toFixed(2);$('level').textContent='גובה המילוי: '+fmt(z)+' ס״מ ('+fmt(z/H*100)+'% מהגובה)';let formulas=sphere?['P = 4πR²','—','4πR³/3']:[['M + 2·a·b','6a²','M + 2S'][s]??(s===7?'M + 2πR²':s===8?'M + πR²':'M + S'),['2(a·h + b·h)','4a²','h·P'][s]??(s===7?'2πR·h':s===8?'πRℓ':'סכום שטחי הפאות הצדדיות'),['a·b·h','a³'][s]??(s===7?'πR²·h':s===8?'πR²·h/3':'S·h'+(pyramid?'/3':''))];let fillControl=$('fill-control');let cardsHTML=[['שטח פנים',F,'סמ״ר',formulas[0]],['שטח מעטפת',M,'סמ״ר',formulas[1]],['נפח מלא',V,'סמ״ק',formulas[2]],['גובה',H,'ס״מ',sphere?'2R':s===1?'a':'h'],['כמות המילוי',V*f,'סמ״ק','V × '+fmt(f)],[[7,8].includes(s)?'היקף הבסיס':'אורך מקצוע',[7,8].includes(s)?2*Math.PI*r:s>=7?NaN:a,'ס״מ',[7,8].includes(s)?'2πR':s>=7?'אין מקצועות מצולעיים':'a (מקצוע בסיס)']].map(([t,v,u,e],i)=>{let mode=['surface','lateral','volume','height','volume',[7,8].includes(s)?'perimeter':'edge'][i];let legends={surface:'<i class="key base-key"></i>בסיסים · <i class="key side-key"></i>מעטפת',lateral:'<i class="key side-key"></i>פאות צדדיות',volume:'<i class="key fill-key"></i>חומר המילוי',height:'<i class="key height-key"></i>גובה מאונך לבסיס',perimeter:'<i class="key edge-key"></i>היקף בסיס מעגלי',edge:'<i class="key edge-key"></i>מקצועות ואורכיהם'};return `<button type="button" class="stat" data-mode="${mode}" aria-pressed="${selectedMode===mode}" ${isNaN(v)?'disabled':''}>${t}<b>${isNaN(v)?'לא מוגדר':fmt(v)+' '+u}</b>${(i===1&&selectedMode==='lateral')||(i===2&&selectedMode==='volume')?'':`<span dir="ltr">${e}</span>`}<span class="legend">${sphere&&mode==='surface'?'<i class="key side-key"></i>פני הכדור':legends[mode]}</span></button>`}).join('');if(!$('stats').children.length){$('stats').innerHTML=cardsHTML;let lateralCard=$('stats').children[1];let lateralPanel=document.createElement('div');lateralPanel.className='lateral-panel';lateralCard.replaceWith(lateralPanel);lateralPanel.appendChild(lateralCard);let netButton=document.createElement('button');netButton.type='button';netButton.id='net-launch';netButton.className='net-launch';netButton.textContent='פריסת מעטפת';netButton.setAttribute('aria-controls','net-dialog');netButton.setAttribute('aria-expanded','false');netButton.onclick=openNet;lateralPanel.appendChild(netButton);let fillCard=$('stats').children[4];let fillPanel=document.createElement('div');fillPanel.className='fill-panel';fillCard.replaceWith(fillPanel);fillPanel.appendChild(fillCard);fillControl.hidden=false;fillPanel.appendChild(fillControl)}else{let template=document.createElement('div');template.innerHTML=cardsHTML;let buttons=$('stats').querySelectorAll('button[data-mode]');Array.from(template.children).forEach((fresh,i)=>{let current=buttons[i];current.innerHTML=fresh.innerHTML;current.dataset.mode=fresh.dataset.mode;current.disabled=fresh.disabled;current.setAttribute('aria-pressed',fresh.getAttribute('aria-pressed'))})}$('net-launch').hidden=sphere;showCalculation(s);$('note').textContent=pyramid?'בפירמידה ובחרוט, חצי נפח אינו חצי גובה. החתכים נעשים קטנים ככל שמתקרבים לקודקוד.':sphere?'גובה המילוי מחושב לפי נפח כיפה כדורית.':'בגוף בעל חתך קבוע, אחוז הנפח שווה לאחוז הגובה.';draw('main',+$('yaw').value*Math.PI/180,+$('pitch').value*Math.PI/180,z);draw('front',0,0,z);draw('top',0,Math.PI/2,z);draw('right',Math.PI/2,0,z)}
 function draw(id,yaw,pitch,z){let c=$(id),w=c.clientWidth,hh=c.clientHeight;c.width=w*devicePixelRatio;c.height=hh*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let all=faces.flatMap(f=>f.v),min=[0,1,2].map(k=>Math.min(...all.map(v=>v[k]))),max=[0,1,2].map(k=>Math.max(...all.map(v=>v[k]))),center=min.map((v,k)=>(v+max[k])/2),scale=Math.min(w,hh)*.70/Math.hypot(...max.map((v,k)=>v-min[k]));let shaveX=+$('shave-x').value/100,shaveY=+$('shave-y').value/100,limitX=max[0]-(max[0]-min[0])*shaveX,limitY=H*(1-shaveY),cutting=shaveX>0||shaveY>0;let visibleFaces=faces;if(shaveY>0)visibleFaces=shavedMesh(visibleFaces,1,limitY);if(shaveX>0)visibleFaces=shavedMesh(visibleFaces,0,limitX);if(shaveX>=1||shaveY>=1)visibleFaces=[];function proj(v){let [x,y,z]=sub(v,center),X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=-x*Math.sin(yaw)+z*Math.cos(yaw);return[w/2+X*scale,hh/2-(y*Math.cos(pitch)-Z*Math.sin(pitch))*scale,y*Math.sin(pitch)+Z*Math.cos(pitch)]}function poly(v,col,stroke){if(shaveY>0)v=clipPlane(v,1,limitY);if(shaveX>0)v=clipPlane(v,0,limitX);if(v.length<3||shaveX>=1||shaveY>=1)return;ctx.beginPath();v.map(proj).forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=col;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}let mode=selectedMode;visibleFaces.slice().sort((a,b)=>a.v.reduce((t,v)=>t+proj(v)[2],0)/a.v.length-b.v.reduce((t,v)=>t+proj(v)[2],0)/b.v.length).forEach(f=>{poly(f.v,f.cut?'#e76badaf':mode==='surface'?(f.base?'#8758cf99':'#e8a43799'):mode==='lateral'?(f.base?'#8758cf18':'#e8a437bb'):f.base?'#8758cf44':'#e8a43730',f.cut?'#a52a70':(sphere||[7,8].includes(+$('shape').value))?null:'#40617988');if(mode==='volume'&&z>0&&!f.cut)poly(clip(f.v,z),'#159ee075',null)});if(mode==='volume'&&z>0&&z<H){let ring=sphere?Array.from({length:96},(_,i)=>{let rr=Math.sqrt(r*r-(z-r)**2);return[rr*Math.cos(i*Math.PI/48),z,rr*Math.sin(i*Math.PI/48)]}):base.map(v=>pyramid?v.map((x,k)=>k===1?z:x+(apex[k]-x)*z/H):[v[0],z,v[2]]);poly(ring,'#40c6eeaa','#137ea8')}if([7,8].includes(+$('shape').value)&&!cutting){
 // Smooth solids show only their silhouette and circular base rims.
 let rim=base.map(proj),topRim=+$('shape').value===7?base.map(v=>proj([v[0],H,v[2]])):[],tip=proj(apex),points=[...rim,...(topRim.length?topRim:[tip])];
@@ -91,7 +102,7 @@ ctx.strokeStyle=mode==='perimeter'?'#b12d68':'#7052a0';ctx.lineWidth=mode==='per
 if(mode==='edge'&&+$('shape').value<7){let unique=new Map();visibleFaces.forEach(f=>f.v.forEach((v,i)=>{let n=f.v[(i+1)%f.v.length];let key=[v.join(','),n.join(',')].sort().join('|');unique.set(key,[v,n])}));let projected=[];for(let [v,n] of unique.values()){let p=proj(v),q=proj(n);ctx.lineWidth=2;ctx.strokeStyle='#b12d68';ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();let x=(p[0]+q[0])/2,y=(p[1]+q[1])/2,dx=q[0]-p[0],dy=q[1]-p[1],length=Math.hypot(dx,dy);if(id!=='main'&&length<8)continue;let sign=(x-w/2)*(-dy)+(y-hh/2)*dx>=0?1:-1;let ox=length?(-dy/length)*14*sign:14,oy=length?(dx/length)*14*sign:0;projected.push([fmt(norm(sub(v,n)))+' ס״מ',x+ox,y+oy,x,y])}let placed=[];projected.forEach(([t,x,y,mx,my])=>{for(let k=0;k<12&&placed.some(p=>Math.abs(p[0]-x)<52&&Math.abs(p[1]-y)<21);k++)y+=(y<hh/2?-1:1)*21;placed.push([x,y]);ctx.strokeStyle='#b12d6888';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(x,y);ctx.stroke();label(t,x,y)})}
 if(id==='main'&&mode!=='edge'){
   const shape=+$('shape').value, colors=calculationColors;
-  const text=mode==='perimeter'?'היקף הבסיס: '+fmt(2*Math.PI*r)+' ס״מ':mode==='surface'?'שטח פנים: '+fmt(F)+' סמ״ר':mode==='lateral'?(sphere?'אין מעטפת מוגדרת':'שטח מעטפת: '+fmt(M)+' סמ״ר'):mode==='volume'&&z>0?'מילוי: '+fmt(V*+$('fill').value/100)+' סמ״ק':'';
+  const text=mode==='perimeter'?'היקף הבסיס: '+fmt(2*Math.PI*r)+' ס״מ':mode==='surface'?'שטח פנים: '+fmt(F)+' סמ״ר':'';
   if(text)label(text,w/2,25,'#125d79');
   const inside=v=>v[0]<=limitX+1e-8&&v[1]<=limitY+1e-8&&visibleFaces.length;
   const placed=[];
@@ -115,7 +126,7 @@ if(id==='main'&&mode!=='edge'){
     mark(text,midpoint(u,v),color,offset);
   }
   const showingCalculation=mode==='volume'||mode==='lateral';
-  if(shape>=7){
+  if(shape>=7&&['volume','lateral','surface','perimeter'].includes(mode)){
     const y=sphere?r:0;
     segment([0,y,0],[r,y,0],'R = '+fmt(r),colors.base,16);
   }
@@ -144,9 +155,18 @@ if(id==='main'&&mode!=='edge'){
     }
   }
 }
-// For a cone, h belongs to the volume and height views. The mantle uses ℓ.
-if (+$('shape').value !== 8 || mode === 'volume' || mode === 'height') {
-  let foot=pyramid?[apex[0],0,apex[2]]:sphere?[0,0,0]:[center[0],0,center[2]],tip=[foot[0],H,foot[2]];let p=proj(foot),q=proj(tip);ctx.setLineDash([6,4]);ctx.strokeStyle='#bd5300';ctx.lineWidth=mode==='height'?4:2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#a04600';ctx.font='bold 15px Arial';ctx.fillText((sphere?'2R':+$('shape').value===1?'a':'h')+' = '+fmt(H),(p[0]+q[0])/2+8,(p[1]+q[1])/2);
+const shape=+$('shape').value;
+const showHeight=mode==='height'||(mode==='volume'&&shape!==1&&!sphere)||(mode==='lateral'&&[0,2,7].includes(shape));
+if(showHeight&&visibleFaces.length){
+  const foot=pyramid?[apex[0],0,apex[2]]:sphere?[0,0,0]:[center[0],0,center[2]];
+  const tip=[foot[0],H,foot[2]];
+  const p=proj(foot),q=proj(tip);
+  if(foot[0]<=limitX+1e-8&&tip[1]<=limitY+1e-8&&Math.hypot(q[0]-p[0],q[1]-p[1])>6){
+    ctx.setLineDash([6,4]);ctx.strokeStyle='#bd5300';ctx.lineWidth=mode==='height'?4:2;
+    ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);
+    const symbol=sphere?'2R':shape===1?'a':'h';
+    label(`${symbol} = ${fmt(H)}`,(p[0]+q[0])/2+18,(p[1]+q[1])/2,calculationColors.height);
+  }
 }
 }
 // Each planar face keeps its dimensions while rotating about the common edge.
@@ -215,38 +235,39 @@ function drawNet(t){
   }
   const annotation=[];
   const mid=(u,v)=>u.map((x,i)=>(x+v[i])/2);
-  function tag(text,at,dy=0){
+  function tag(text,at,dy=0,color='#20374b'){
     const [x,y]=screen(at).split(',').map(Number);
-    annotation.push(`<text x="${x}" y="${y+dy}" text-anchor="middle" dominant-baseline="central" fill="#20374b" stroke="#f6f9fc" stroke-width="4" paint-order="stroke" font-family="Arial" font-weight="bold" font-size="19">${text}</text>`);
+    annotation.push(`<text x="${x}" y="${y+dy}" text-anchor="middle" dominant-baseline="central" fill="${color}" stroke="#f6f9fc" stroke-width="4" paint-order="stroke" font-family="Arial" font-weight="bold" font-size="19">${text}</text>`);
   }
-  function measure(u,v,text,dy){
-    annotation.push(`<polyline points="${screen(u)} ${screen(v)}" stroke="#56369a" stroke-width="2" fill="none"/>`);
-    tag(text,mid(u,v),dy);
+  function measure(u,v,text,dy,color=calculationColors.base){
+    annotation.push(`<polyline points="${screen(u)} ${screen(v)}" stroke="${color}" stroke-width="2" fill="none"/>`);
+    tag(text,mid(u,v),dy,color);
   }
   const first=panels[0], shape=netScene.shape;
   if(shape===7){
     const middle=panels[Math.floor(panels.length/2)];
-    measure(first[0],first[3],`h = ${fmt(H)}`,-13);
+    measure(first[0],first[3],`h = ${fmt(H)}`,-13,calculationColors.height);
     tag(`2πR ≈ ${fmt(2*Math.PI*r)}`,middle[0],22);
   }else if(shape===8){
     const middle=panels[Math.floor(panels.length/2)];
-    measure(first[0],first[2],`ℓ = ${fmt(Math.hypot(r,H))}`,-13);
+    measure(first[0],first[2],`ℓ = ${fmt(Math.hypot(r,H))}`,-13,calculationColors.side);
     tag(`2πR ≈ ${fmt(2*Math.PI*r)}`,middle[0],22);
   }else if(pyramid){
     const original=netScene.sides[0].v, direction=sub(original[1],original[0]);
     const fraction=dot(sub(original[2],original[0]),direction)/dot(direction,direction);
     const foot=first[0].map((v,i)=>v+(first[1][i]-v)*fraction);
     measure(first[0],first[1],`בסיס הפאה ${fmt(norm(direction))}`,17);
-    measure(first[2],foot,`גובה הפאה ${fmt(area(original)*2/norm(direction))}`,-13);
+    measure(first[2],foot,`גובה הפאה ${fmt(area(original)*2/norm(direction))}`,-13,calculationColors.side);
+  }else if(shape===1){
+    measure(first[0],first[1],`a = ${fmt(a)}`,18);
   }else{
-    measure(first[0],first[3],`${shape===1?'a':'h'} = ${fmt(H)}`,-14);
-    panels.forEach((panel,i)=>{
-      if(i===0||t>.72){
-        const v=netScene.sides[i].v;
-        const symbol=shape===1?'a':shape===2?['a','c','b'][i]:['a','b','a','b'][i];
-        measure(panel[0],panel[1],`${symbol} = ${fmt(norm(sub(v[1],v[0])))}`,18);
-      }
-    });
+    measure(first[0],first[3],`h = ${fmt(H)}`,-14,calculationColors.height);
+    if(shape===2){
+      tag(`P = ${fmt(baseMeasures(shape).perimeter)}`,panels[1][0],22,calculationColors.base);
+    }else{
+      measure(first[0],first[1],`a = ${fmt(a)}`,18);
+      if(t>.72)measure(panels[1][0],panels[1][1],`b = ${fmt(b)}`,18);
+    }
   }
   $('net-picture').innerHTML=surface+outline+annotation.join('');
   $('net-progress').value=Math.round(t*100);
@@ -281,12 +302,12 @@ function openNet(){
   const explanation=shape===7?'הגליל נפרס למלבן שרוחבו היקף הבסיס וגובהו גובה הגליל.':shape===8?'החרוט נפרס לגזרה שרדיוסה אורך הקו היוצר, ואורך הקשת שלה הוא היקף הבסיס.':'הפאות הצדדיות נפתחות סביב המקצועות המשותפים עד שהן מונחות במישור אחד.';
   $('net-description').textContent=explanation+' המידות בס״מ.';
   selectedMode='lateral';
-  render();
   $('net-dialog').hidden=false;
+  render();
   $('net-launch').setAttribute('aria-expanded','true');
   playNet();
   $('net-close').focus({preventScroll:true});
-  $('net-title').scrollIntoView({block:'center'});
+  $('net-dialog').parentElement.scrollIntoView({block:'start'});
 }
 $('net-replay').onclick=playNet;
 $('net-progress').oninput=()=>{cancelAnimationFrame(netFrame);drawNet(+$('net-progress').value/100)};
@@ -296,7 +317,7 @@ function closeNet(restoreFocus){
   cancelAnimationFrame(netFrame);
   pane.hidden=true;
   $('net-launch').setAttribute('aria-expanded','false');
-  if(restoreFocus)$('net-launch').focus();
+  if(restoreFocus){render();$('net-launch').focus()}
 }
 $('net-close').onclick=()=>closeNet(true);
 $('net-dialog').onkeydown=e=>{if(e.key==='Escape')closeNet(true)};
