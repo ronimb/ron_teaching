@@ -37,32 +37,48 @@ function showCalculation(shape){
   const baseInfo=baseMeasures(shape), n=fmt;
   const line=(text,cls='')=>`<p dir="ltr" class="${cls}">${text}</p>`;
   const result=(value,units)=>`<p class="calc-result">תוצאה <bdi>${n(value)}</bdi> ${units}</p>`;
+  const height=line(`h = ${n(H)}`,'calc-height');
+  const radius=line(`R = ${n(r)}`,'calc-base');
+  const lengths=line(`a = ${n(a)}, b = ${n(b)}`,'calc-base');
   let content;
   if(mode==='volume'){
     if(sphere){
-      content=line(`R = ${n(r)}`,'calc-base')+line('V = 4πR³ / 3')+line(`V = 4π × ${n(r)}³ / 3`);
+      content=radius+line('V = (4 / 3) · π · R³')+line(`V = (4 / 3) · π · ${n(r)}³`);
+    }else if(shape===0){
+      content=lengths+height+line('V = a · b · h')+line(`V = ${n(a)} · ${n(b)} · ${n(H)}`);
+    }else if(shape===1){
+      content=line(`a = ${n(a)}`,'calc-base')+line('V = a³')+line(`V = ${n(a)}³`);
+    }else if(shape===7||shape===8){
+      const divisor=shape===8?' / 3':'';
+      content=radius+height+line(`V = π · R² · h${divisor}`)+line(`V = π · ${n(r)}² · ${n(H)}${divisor}`);
     }else{
       const divisor=pyramid?' / 3':'';
-      content=line(`S = ${baseInfo.areaRule} ≈ ${n(baseInfo.area)}`,'calc-base')+line(`h = ${n(H)}`,'calc-height')+
-        line(`V = S × h${divisor}`)+line(`V ≈ ${n(baseInfo.area)} × ${n(H)}${divisor}`);
+      content=line(`S = ${baseInfo.areaRule} ≈ ${n(baseInfo.area)}`,'calc-base')+height+
+        line(`V = S · h${divisor}`)+line(`V ≈ ${n(baseInfo.area)} · ${n(H)}${divisor}`);
     }
     content+=result(V,'סמ״ק');
+  }else if(shape===0){
+    content=lengths+height+line('M = 2(a · h + b · h)')+
+      line(`M = 2(${n(a)} · ${n(H)} + ${n(b)} · ${n(H)})`)+result(M,'סמ״ר');
+  }else if(shape===1){
+    content=line(`a = ${n(a)}`,'calc-base')+line('M = 4 · a²')+line(`M = 4 · ${n(a)}²`)+result(M,'סמ״ר');
+  }else if(shape===7){
+    content=radius+height+line('M = 2 · π · R · h')+line(`M = 2 · π · ${n(r)} · ${n(H)}`)+result(M,'סמ״ר');
   }else if(shape===8){
     const slant=Math.hypot(r,H);
     content=line(`R = ${n(r)}`,'calc-base')+line(`ℓ = √(R² + h²) ≈ ${n(slant)}`,'calc-side')+
-      line('M = πRℓ')+line(`M ≈ π × ${n(r)} × ${n(slant)}`)+result(M,'סמ״ר');
+      line('M = π · R · ℓ')+line(`M ≈ π · ${n(r)} · ${n(slant)}`)+result(M,'סמ״ר');
   }else if(pyramid){
     const areas=lateralFaces().map(face=>area(face.v));
-    const terms=areas.map((_,i)=>`A${'₁₂₃₄'[i]}`);
-    content='<p class="calc-side">כל סימון מציין שטח של פאה משולשת.</p>'+line('Aᵢ = bᵢ × ℓᵢ / 2','calc-side')+
-      line(`M = ${terms.join(' + ')}`)+line(`M ≈ ${areas.map(n).join(' + ')}`)+result(M,'סמ״ר');
+    content='<p class="calc-side"><bdi>M</bdi> = סכום שטחי הפאות הצדדיות</p>'+
+      line(`M ≈ ${areas.map(n).join(' + ')}`)+result(M,'סמ״ר');
   }else{
     content=line(`P = ${baseInfo.perimeterRule} ≈ ${n(baseInfo.perimeter)}`,'calc-base')+line(`h = ${n(H)}`,'calc-height')+
-      line('M = P × h')+line(`M ≈ ${n(baseInfo.perimeter)} × ${n(H)}`)+result(M,'סמ״ר');
+      line('M = h · P')+line(`M ≈ ${n(H)} · ${n(baseInfo.perimeter)}`)+result(M,'סמ״ר');
   }
   $('calculation-lines').innerHTML=content;
 }
-function render(){$('shave-x-value').textContent=fmt(+$('shave-x').value)+'%';$('shave-y-value').textContent=fmt(+$('shave-y').value)+'%';let f=+$('fill').value/100,z=fractionHeight(f),s=+$('shape').value;$('pct').textContent=fmt(f*100)+'%';$('amount').value=(V*f).toFixed(2);$('level').textContent='גובה המילוי: '+fmt(z)+' ס״מ ('+fmt(z/H*100)+'% מהגובה)';let formulas=sphere?['4πR²','—','4πR³/3']:['M + '+(pyramid?'S':'2S'),pyramid?'סכום שטחי הפאות הצדדיות':'P·h','S·h'+(pyramid?'/3':'')];let fillControl=$('fill-control');let cardsHTML=[['שטח פנים',F,'סמ״ר',formulas[0]],['שטח מעטפת',M,'סמ״ר',formulas[1]],['נפח מלא',V,'סמ״ק',formulas[2]],['גובה',H,'ס״מ',sphere?'2R':'h'],['כמות המילוי',V*f,'סמ״ק','V × '+fmt(f)],[[7,8].includes(s)?'היקף הבסיס':'אורך מקצוע',[7,8].includes(s)?2*Math.PI*r:s>=7?NaN:a,'ס״מ',[7,8].includes(s)?'2πR':s>=7?'אין מקצועות מצולעיים':'a (מקצוע בסיס)']].map(([t,v,u,e],i)=>{let mode=['surface','lateral','volume','height','volume',[7,8].includes(s)?'perimeter':'edge'][i];let legends={surface:'<i class="key base-key"></i>בסיסים · <i class="key side-key"></i>מעטפת',lateral:'<i class="key side-key"></i>פאות צדדיות',volume:'<i class="key fill-key"></i>חומר המילוי',height:'<i class="key height-key"></i>גובה מאונך לבסיס',perimeter:'<i class="key edge-key"></i>היקף בסיס מעגלי',edge:'<i class="key edge-key"></i>מקצועות ואורכיהם'};return `<button type="button" class="stat" data-mode="${mode}" aria-pressed="${selectedMode===mode}" ${isNaN(v)?'disabled':''}>${t}<b>${isNaN(v)?'לא מוגדר':fmt(v)+' '+u}</b><span dir="ltr">${e}</span><span class="legend">${sphere&&mode==='surface'?'<i class="key side-key"></i>פני הכדור':legends[mode]}</span></button>`}).join('');if(!$('stats').children.length){$('stats').innerHTML=cardsHTML;let lateralCard=$('stats').children[1];let lateralPanel=document.createElement('div');lateralPanel.className='lateral-panel';lateralCard.replaceWith(lateralPanel);lateralPanel.appendChild(lateralCard);let netButton=document.createElement('button');netButton.type='button';netButton.id='net-launch';netButton.className='net-launch';netButton.textContent='פריסת מעטפת';netButton.setAttribute('aria-controls','net-dialog');netButton.setAttribute('aria-expanded','false');netButton.onclick=openNet;lateralPanel.appendChild(netButton);let fillCard=$('stats').children[4];let fillPanel=document.createElement('div');fillPanel.className='fill-panel';fillCard.replaceWith(fillPanel);fillPanel.appendChild(fillCard);fillControl.hidden=false;fillPanel.appendChild(fillControl)}else{let template=document.createElement('div');template.innerHTML=cardsHTML;let buttons=$('stats').querySelectorAll('button[data-mode]');Array.from(template.children).forEach((fresh,i)=>{let current=buttons[i];current.innerHTML=fresh.innerHTML;current.dataset.mode=fresh.dataset.mode;current.disabled=fresh.disabled;current.setAttribute('aria-pressed',fresh.getAttribute('aria-pressed'))})}$('net-launch').hidden=sphere;showCalculation(s);$('note').textContent=pyramid?'בפירמידה ובחרוט, חצי נפח אינו חצי גובה. החתכים נעשים קטנים ככל שמתקרבים לקודקוד.':sphere?'גובה המילוי מחושב לפי נפח כיפה כדורית.':'בגוף בעל חתך קבוע, אחוז הנפח שווה לאחוז הגובה.';draw('main',+$('yaw').value*Math.PI/180,+$('pitch').value*Math.PI/180,z);draw('front',0,0,z);draw('top',0,Math.PI/2,z);draw('right',Math.PI/2,0,z)}
+function render(){$('shave-x-value').textContent=fmt(+$('shave-x').value)+'%';$('shave-y-value').textContent=fmt(+$('shave-y').value)+'%';let f=+$('fill').value/100,z=fractionHeight(f),s=+$('shape').value;$('pct').textContent=fmt(f*100)+'%';$('amount').value=(V*f).toFixed(2);$('level').textContent='גובה המילוי: '+fmt(z)+' ס״מ ('+fmt(z/H*100)+'% מהגובה)';let formulas=sphere?['P = 4πR²','—','4πR³/3']:[['M + 2·a·b','6a²','M + 2S'][s]??(s===7?'M + 2πR²':s===8?'M + πR²':'M + S'),['2(a·h + b·h)','4a²','h·P'][s]??(s===7?'2πR·h':s===8?'πRℓ':'סכום שטחי הפאות הצדדיות'),['a·b·h','a³'][s]??(s===7?'πR²·h':s===8?'πR²·h/3':'S·h'+(pyramid?'/3':''))];let fillControl=$('fill-control');let cardsHTML=[['שטח פנים',F,'סמ״ר',formulas[0]],['שטח מעטפת',M,'סמ״ר',formulas[1]],['נפח מלא',V,'סמ״ק',formulas[2]],['גובה',H,'ס״מ',sphere?'2R':s===1?'a':'h'],['כמות המילוי',V*f,'סמ״ק','V × '+fmt(f)],[[7,8].includes(s)?'היקף הבסיס':'אורך מקצוע',[7,8].includes(s)?2*Math.PI*r:s>=7?NaN:a,'ס״מ',[7,8].includes(s)?'2πR':s>=7?'אין מקצועות מצולעיים':'a (מקצוע בסיס)']].map(([t,v,u,e],i)=>{let mode=['surface','lateral','volume','height','volume',[7,8].includes(s)?'perimeter':'edge'][i];let legends={surface:'<i class="key base-key"></i>בסיסים · <i class="key side-key"></i>מעטפת',lateral:'<i class="key side-key"></i>פאות צדדיות',volume:'<i class="key fill-key"></i>חומר המילוי',height:'<i class="key height-key"></i>גובה מאונך לבסיס',perimeter:'<i class="key edge-key"></i>היקף בסיס מעגלי',edge:'<i class="key edge-key"></i>מקצועות ואורכיהם'};return `<button type="button" class="stat" data-mode="${mode}" aria-pressed="${selectedMode===mode}" ${isNaN(v)?'disabled':''}>${t}<b>${isNaN(v)?'לא מוגדר':fmt(v)+' '+u}</b><span dir="ltr">${e}</span><span class="legend">${sphere&&mode==='surface'?'<i class="key side-key"></i>פני הכדור':legends[mode]}</span></button>`}).join('');if(!$('stats').children.length){$('stats').innerHTML=cardsHTML;let lateralCard=$('stats').children[1];let lateralPanel=document.createElement('div');lateralPanel.className='lateral-panel';lateralCard.replaceWith(lateralPanel);lateralPanel.appendChild(lateralCard);let netButton=document.createElement('button');netButton.type='button';netButton.id='net-launch';netButton.className='net-launch';netButton.textContent='פריסת מעטפת';netButton.setAttribute('aria-controls','net-dialog');netButton.setAttribute('aria-expanded','false');netButton.onclick=openNet;lateralPanel.appendChild(netButton);let fillCard=$('stats').children[4];let fillPanel=document.createElement('div');fillPanel.className='fill-panel';fillCard.replaceWith(fillPanel);fillPanel.appendChild(fillCard);fillControl.hidden=false;fillPanel.appendChild(fillControl)}else{let template=document.createElement('div');template.innerHTML=cardsHTML;let buttons=$('stats').querySelectorAll('button[data-mode]');Array.from(template.children).forEach((fresh,i)=>{let current=buttons[i];current.innerHTML=fresh.innerHTML;current.dataset.mode=fresh.dataset.mode;current.disabled=fresh.disabled;current.setAttribute('aria-pressed',fresh.getAttribute('aria-pressed'))})}$('net-launch').hidden=sphere;showCalculation(s);$('note').textContent=pyramid?'בפירמידה ובחרוט, חצי נפח אינו חצי גובה. החתכים נעשים קטנים ככל שמתקרבים לקודקוד.':sphere?'גובה המילוי מחושב לפי נפח כיפה כדורית.':'בגוף בעל חתך קבוע, אחוז הנפח שווה לאחוז הגובה.';draw('main',+$('yaw').value*Math.PI/180,+$('pitch').value*Math.PI/180,z);draw('front',0,0,z);draw('top',0,Math.PI/2,z);draw('right',Math.PI/2,0,z)}
 function draw(id,yaw,pitch,z){let c=$(id),w=c.clientWidth,hh=c.clientHeight;c.width=w*devicePixelRatio;c.height=hh*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let all=faces.flatMap(f=>f.v),min=[0,1,2].map(k=>Math.min(...all.map(v=>v[k]))),max=[0,1,2].map(k=>Math.max(...all.map(v=>v[k]))),center=min.map((v,k)=>(v+max[k])/2),scale=Math.min(w,hh)*.70/Math.hypot(...max.map((v,k)=>v-min[k]));let shaveX=+$('shave-x').value/100,shaveY=+$('shave-y').value/100,limitX=max[0]-(max[0]-min[0])*shaveX,limitY=H*(1-shaveY),cutting=shaveX>0||shaveY>0;let visibleFaces=faces;if(shaveY>0)visibleFaces=shavedMesh(visibleFaces,1,limitY);if(shaveX>0)visibleFaces=shavedMesh(visibleFaces,0,limitX);if(shaveX>=1||shaveY>=1)visibleFaces=[];function proj(v){let [x,y,z]=sub(v,center),X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=-x*Math.sin(yaw)+z*Math.cos(yaw);return[w/2+X*scale,hh/2-(y*Math.cos(pitch)-Z*Math.sin(pitch))*scale,y*Math.sin(pitch)+Z*Math.cos(pitch)]}function poly(v,col,stroke){if(shaveY>0)v=clipPlane(v,1,limitY);if(shaveX>0)v=clipPlane(v,0,limitX);if(v.length<3||shaveX>=1||shaveY>=1)return;ctx.beginPath();v.map(proj).forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=col;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}let mode=selectedMode;visibleFaces.slice().sort((a,b)=>a.v.reduce((t,v)=>t+proj(v)[2],0)/a.v.length-b.v.reduce((t,v)=>t+proj(v)[2],0)/b.v.length).forEach(f=>{poly(f.v,f.cut?'#e76badaf':mode==='surface'?(f.base?'#8758cf99':'#e8a43799'):mode==='lateral'?(f.base?'#8758cf18':'#e8a437bb'):f.base?'#8758cf44':'#e8a43730',f.cut?'#a52a70':(sphere||[7,8].includes(+$('shape').value))?null:'#40617988');if(mode==='volume'&&z>0&&!f.cut)poly(clip(f.v,z),'#159ee075',null)});if(mode==='volume'&&z>0&&z<H){let ring=sphere?Array.from({length:96},(_,i)=>{let rr=Math.sqrt(r*r-(z-r)**2);return[rr*Math.cos(i*Math.PI/48),z,rr*Math.sin(i*Math.PI/48)]}):base.map(v=>pyramid?v.map((x,k)=>k===1?z:x+(apex[k]-x)*z/H):[v[0],z,v[2]]);poly(ring,'#40c6eeaa','#137ea8')}if([7,8].includes(+$('shape').value)&&!cutting){
 // Smooth solids show only their silhouette and circular base rims.
 let rim=base.map(proj),topRim=+$('shape').value===7?base.map(v=>proj([v[0],H,v[2]])):[],tip=proj(apex),points=[...rim,...(topRim.length?topRim:[tip])];
@@ -99,23 +115,26 @@ if(id==='main'&&mode!=='edge'){
     mark(text,midpoint(u,v),color,offset);
   }
   const showingCalculation=mode==='volume'||mode==='lateral';
-  if(shape>=7&&(mode!=='lateral'||shape===8)){
+  if(shape>=7){
     const y=sphere?r:0;
     segment([0,y,0],[r,y,0],'R = '+fmt(r),colors.base,16);
   }
   if(showingCalculation&&!sphere){
     const baseInfo=baseMeasures(shape);
     const baseCenter=base[0].map((_,i)=>base.reduce((sum,v)=>sum+v[i],0)/base.length);
-    if(mode==='volume'){
-      mark('S = '+fmt(baseInfo.area),baseCenter,colors.base,-17);
+    if(shape===0||shape===1){
+      segment(base[0],base[1],'a = '+fmt(a),colors.base,16);
+      if(shape===0)segment(base[1],base[2],'b = '+fmt(b),colors.base,18);
+    }else if(mode==='volume'){
+      if(shape!==7&&shape!==8)mark('S = '+fmt(baseInfo.area),baseCenter,colors.base,-17);
     }else if(shape===8){
       segment(apex,[-r,0,0],'ℓ = '+fmt(Math.hypot(r,H)),colors.side,-16);
     }else if(pyramid){
       lateralFaces().forEach((face,i)=>{
         const centroid=face.v[0].map((_,k)=>face.v.reduce((sum,v)=>sum+v[k],0)/3);
-        mark('A'+'₁₂₃₄'[i]+' = '+fmt(area(face.v)),centroid,colors.side);
+        mark('פאה '+(i+1)+' · '+fmt(area(face.v))+' סמ״ר',centroid,colors.side);
       });
-    }else{
+    }else if(shape===2){
       if(!cutting){
         ctx.strokeStyle=colors.base;ctx.lineWidth=2.5;ctx.beginPath();
         base.map(proj).forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
@@ -125,7 +144,7 @@ if(id==='main'&&mode!=='edge'){
     }
   }
 }
-let foot=pyramid?[apex[0],0,apex[2]]:sphere?[0,0,0]:[center[0],0,center[2]],tip=[foot[0],H,foot[2]];let p=proj(foot),q=proj(tip);ctx.setLineDash([6,4]);ctx.strokeStyle='#bd5300';ctx.lineWidth=mode==='height'?4:2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#a04600';ctx.font='bold 15px Arial';ctx.fillText('h = '+fmt(H),(p[0]+q[0])/2+8,(p[1]+q[1])/2)}
+let foot=pyramid?[apex[0],0,apex[2]]:sphere?[0,0,0]:[center[0],0,center[2]],tip=[foot[0],H,foot[2]];let p=proj(foot),q=proj(tip);ctx.setLineDash([6,4]);ctx.strokeStyle='#bd5300';ctx.lineWidth=mode==='height'?4:2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#a04600';ctx.font='bold 15px Arial';ctx.fillText((sphere?'2R':+$('shape').value===1?'a':'h')+' = '+fmt(H),(p[0]+q[0])/2+8,(p[1]+q[1])/2)}
 // Each planar face keeps its dimensions while rotating about the common edge.
 const dot = (u,v) => u.reduce((sum,x,i)=>sum+x*v[i],0);
 const unit = v => v.map(x=>x/norm(v));
@@ -204,19 +223,19 @@ function drawNet(t){
   if(shape===7){
     const middle=panels[Math.floor(panels.length/2)];
     measure(first[0],first[3],`h = ${fmt(H)}`,-13);
-    tag(`P = ${fmt(2*Math.PI*r)}`,middle[0],22);
+    tag(`2πR ≈ ${fmt(2*Math.PI*r)}`,middle[0],22);
   }else if(shape===8){
     const middle=panels[Math.floor(panels.length/2)];
     measure(first[0],first[2],`ℓ = ${fmt(Math.hypot(r,H))}`,-13);
-    tag(`P = ${fmt(2*Math.PI*r)}`,middle[0],22);
+    tag(`2πR ≈ ${fmt(2*Math.PI*r)}`,middle[0],22);
   }else if(pyramid){
     const original=netScene.sides[0].v, direction=sub(original[1],original[0]);
     const fraction=dot(sub(original[2],original[0]),direction)/dot(direction,direction);
     const foot=first[0].map((v,i)=>v+(first[1][i]-v)*fraction);
-    measure(first[0],first[1],`b₁ = ${fmt(norm(direction))}`,17);
-    measure(first[2],foot,`ℓ₁ = ${fmt(area(original)*2/norm(direction))}`,-13);
+    measure(first[0],first[1],`בסיס הפאה ${fmt(norm(direction))}`,17);
+    measure(first[2],foot,`גובה הפאה ${fmt(area(original)*2/norm(direction))}`,-13);
   }else{
-    measure(first[0],first[3],`h = ${fmt(H)}`,-14);
+    measure(first[0],first[3],`${shape===1?'a':'h'} = ${fmt(H)}`,-14);
     panels.forEach((panel,i)=>{
       if(i===0||t>.72){
         const v=netScene.sides[i].v;
