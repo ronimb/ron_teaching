@@ -66,7 +66,7 @@ function showCalculation(shape){
     content=radius+height+line('M = 2 · π · R · h')+line(`M = 2 · π · ${n(r)} · ${n(H)}`)+result(M,'סמ״ר');
   }else if(shape===8){
     const slant=Math.hypot(r,H);
-    content=line(`R = ${n(r)}`,'calc-base')+line(`ℓ = √(R² + h²) ≈ ${n(slant)}`,'calc-side')+
+    content=radius+line(`ℓ ≈ ${n(slant)}`,'calc-side')+
       line('M = π · R · ℓ')+line(`M ≈ π · ${n(r)} · ${n(slant)}`)+result(M,'סמ״ר');
   }else if(pyramid){
     const areas=lateralFaces().map(face=>area(face.v));
@@ -144,7 +144,11 @@ if(id==='main'&&mode!=='edge'){
     }
   }
 }
-let foot=pyramid?[apex[0],0,apex[2]]:sphere?[0,0,0]:[center[0],0,center[2]],tip=[foot[0],H,foot[2]];let p=proj(foot),q=proj(tip);ctx.setLineDash([6,4]);ctx.strokeStyle='#bd5300';ctx.lineWidth=mode==='height'?4:2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#a04600';ctx.font='bold 15px Arial';ctx.fillText((sphere?'2R':+$('shape').value===1?'a':'h')+' = '+fmt(H),(p[0]+q[0])/2+8,(p[1]+q[1])/2)}
+// For a cone, h belongs to the volume and height views. The mantle uses ℓ.
+if (+$('shape').value !== 8 || mode === 'volume' || mode === 'height') {
+  let foot=pyramid?[apex[0],0,apex[2]]:sphere?[0,0,0]:[center[0],0,center[2]],tip=[foot[0],H,foot[2]];let p=proj(foot),q=proj(tip);ctx.setLineDash([6,4]);ctx.strokeStyle='#bd5300';ctx.lineWidth=mode==='height'?4:2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#a04600';ctx.font='bold 15px Arial';ctx.fillText((sphere?'2R':+$('shape').value===1?'a':'h')+' = '+fmt(H),(p[0]+q[0])/2+8,(p[1]+q[1])/2);
+}
+}
 // Each planar face keeps its dimensions while rotating about the common edge.
 const dot = (u,v) => u.reduce((sum,x,i)=>sum+x*v[i],0);
 const unit = v => v.map(x=>x/norm(v));
